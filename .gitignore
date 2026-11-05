@@ -17,3 +17,7 @@ var/
 .mypy_cache/
 .pytest_cache/
 .ruff_cache/
+
+plan.md
+IMPLEMENTATION.md
+
