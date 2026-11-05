@@ -1,0 +1,33 @@
+# Triggers route an incoming CI failure to a skill.
+# Actions are intentionally limited to comments in v1. Phases 6 enables rerun,
+# issue, and fix PR per trigger.
+
+- id: pr_failure
+  enabled: true
+  when:
+    event: workflow_run
+    conclusion: [failure, timed_out]
+    source: pull_request
+  skill: triage-pr-failure
+  allowed_actions: [comment_on_pr]
+  budget: { max_steps: 12, max_cost_usd: 0.50, max_seconds: 180 }
+
+- id: main_failure
+  enabled: true
+  when:
+    event: workflow_run
+    conclusion: [failure, timed_out]
+    source: push
+  skill: find-culprit
+  allowed_actions: [comment_on_pr]
+  budget: { max_steps: 12, max_cost_usd: 0.50, max_seconds: 180 }
+
+- id: nightly_failure
+  enabled: true
+  when:
+    event: workflow_run
+    conclusion: [failure, timed_out]
+    source: schedule
+  skill: triage-nightly
+  allowed_actions: [comment_on_pr]
+  budget: { max_steps: 12, max_cost_usd: 0.50, max_seconds: 180 }

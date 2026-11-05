@@ -32,3 +32,20 @@ flowchart TD
   M --> D
   M --> E
 ```
+
+## Development
+
+Requires [uv](https://docs.astral.sh/uv/) (Python 3.13 is managed by uv).
+
+```bash
+cp .env.example .env   # fill in GitHub App values when testing webhooks
+uv sync
+
+make check             # ruff + mypy + pytest
+make validate          # validate config/triggers.yaml, skills, memory
+make serve             # http://localhost:8000/healthz
+```
+
+The webhook receiver, collector, and runner arrive in Phases 1-2; see
+[`IMPLEMENTATION.md`](./IMPLEMENTATION.md) for the ordered build plan and
+[`plan.md`](./plan.md) for the system design.

@@ -9,4 +9,11 @@ wheels/
 # Virtual environments
 .venv
 
-plan.md
+# Local runtime data
+var/
+.env
+
+# Tool caches
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
