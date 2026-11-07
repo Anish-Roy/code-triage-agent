@@ -48,6 +48,8 @@ class Settings(BaseSettings):
 
     log_level: str = "INFO"
 
+    redaction_patterns: list[str] = Field(default_factory=list)
+
     @field_validator("github_app_private_key", mode="before")
     @classmethod
     def _expand_private_key_newlines(cls, value: object) -> object:

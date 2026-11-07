@@ -14,6 +14,34 @@ _context: contextvars.ContextVar[dict[str, str] | None] = contextvars.ContextVar
     "log_context", default=None
 )
 
+_RESERVED_ATTRS = frozenset(
+    {
+        "name",
+        "msg",
+        "args",
+        "levelname",
+        "levelno",
+        "pathname",
+        "filename",
+        "module",
+        "exc_info",
+        "exc_text",
+        "stack_info",
+        "lineno",
+        "funcName",
+        "created",
+        "msecs",
+        "relativeCreated",
+        "thread",
+        "threadName",
+        "processName",
+        "process",
+        "taskName",
+        "message",
+        "asctime",
+    }
+)
+
 
 @contextmanager
 def bind_context(**values: object) -> Iterator[None]:
@@ -35,6 +63,9 @@ class JsonFormatter(logging.Formatter):
             "message": record.getMessage(),
         }
         payload.update(_context.get() or {})
+        for key, value in record.__dict__.items():
+            if key not in _RESERVED_ATTRS and not key.startswith("_"):
+                payload[key] = value
         if record.exc_info:
             payload["exception"] = self.formatException(record.exc_info)
         return json.dumps(payload, default=str)

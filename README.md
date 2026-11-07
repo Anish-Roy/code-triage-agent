@@ -46,6 +46,27 @@ make validate          # validate config/triggers.yaml, skills, memory
 make serve             # http://localhost:8000/healthz
 ```
 
-The webhook receiver, collector, and runner arrive in Phases 1-2; see
+### Phase 1 status
+
+The plumbing path is implemented and needs no LLM:
+
+```bash
+# Verify GitHub webhook signatures and store failures (202 in under 5s)
+curl -X POST http://localhost:8000/webhooks/github ...
+
+# Process queued events: fetch jobs/logs/diff, trim, redact, sign, snapshot
+uv run code-triage-agent worker --once
+
+# Debug one stored event, or import a raw payload for an offline run
+uv run code-triage-agent collect --event-id 1
+uv run code-triage-agent collect --payload tests/fixtures/github/workflow_run_event.json \
+  --repo acme/widgets --run-id 9001
+```
+
+Each collected run writes `var/snapshots/<run_id>/` with `metadata.json`,
+`logs.txt`, `diff.patch`, `memory.json`, and `signature.txt`. Rows for events,
+runs, steps, and signatures live in `var/triage.db`.
+
+The runner agent and PR comments arrive in Phase 2; see
 [`IMPLEMENTATION.md`](./IMPLEMENTATION.md) for the ordered build plan and
 [`plan.md`](./plan.md) for the system design.

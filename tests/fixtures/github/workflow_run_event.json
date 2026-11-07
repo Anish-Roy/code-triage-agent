@@ -1,0 +1,21 @@
+{
+  "action": "completed",
+  "repository": {
+    "full_name": "acme/widgets",
+    "private": true
+  },
+  "workflow_run": {
+    "id": 9001,
+    "run_attempt": 1,
+    "name": "CI",
+    "event": "pull_request",
+    "status": "completed",
+    "conclusion": "failure",
+    "head_branch": "feature/login",
+    "head_sha": "abc1234def567890abc1234def567890abc12345",
+    "html_url": "https://github.com/acme/widgets/actions/runs/9001",
+    "pull_requests": [
+      { "number": 42 }
+    ]
+  }
+}

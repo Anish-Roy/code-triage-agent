@@ -1,0 +1,8 @@
+diff --git a/src/widgets/login.py b/src/widgets/login.py
+index 1111111..2222222 100644
+--- a/src/widgets/login.py
++++ b/src/widgets/login.py
+@@ -10,7 +10,7 @@ def login(user: str) -> Response:
+     session = Session()
+-    return Response(status=200)
++    return Response(status=500)

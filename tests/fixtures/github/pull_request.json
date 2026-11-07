@@ -1,0 +1,14 @@
+{
+  "number": 42,
+  "state": "open",
+  "merged": false,
+  "merge_commit_sha": null,
+  "head": {
+    "ref": "feature/login",
+    "sha": "abc1234def567890abc1234def567890abc12345"
+  },
+  "base": {
+    "ref": "main",
+    "sha": "fedcba9876543210fedcba9876543210fedcba98"
+  }
+}
