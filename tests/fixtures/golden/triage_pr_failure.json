@@ -1,0 +1,133 @@
+{
+  "actions": [
+    "comment_on_pr"
+  ],
+  "comment": {
+    "body": "## CI triage: `real_bug` (91% confidence)\nWorkflow: CI\n\n`app/auth.py` now returns the user id instead of the user object, so the login endpoint returns 500.\n\n**Evidence**\n- `AssertionError: expected 200 got 500` (log) \u2014 the test fails on the response status\n- `return session.user.id` (diff) \u2014 the changed return value no longer matches the caller\n\n**Next step:** Restore the user object or update the caller to use the id.\n\n<!-- code-triage-agent:run_id=r_golden -->\n",
+    "comment_id": null,
+    "posted": false,
+    "skipped_reason": "dry_run/replay"
+  },
+  "cost_usd": 0.0144,
+  "decision": {
+    "category": "real_bug",
+    "confidence": 0.91,
+    "evidence": [
+      {
+        "quote": "AssertionError: expected 200 got 500",
+        "source": "log",
+        "why": "the test fails on the response status"
+      },
+      {
+        "quote": "return session.user.id",
+        "source": "diff",
+        "why": "the changed return value no longer matches the caller"
+      }
+    ],
+    "memory_note": null,
+    "needs_human": false,
+    "recommended_action": {
+      "params": {
+        "next_step": "Restore the user object or update the caller to use the id."
+      },
+      "type": "comment"
+    },
+    "summary": "`app/auth.py` now returns the user id instead of the user object, so the login endpoint returns 500."
+  },
+  "error": null,
+  "skill_id": "triage-pr-failure",
+  "status": "succeeded",
+  "steps": [
+    {
+      "args": {
+        "messages": 2,
+        "temperature": 0.2
+      },
+      "cost_usd": 0.0048,
+      "is_error": false,
+      "kind": "llm",
+      "result": {
+        "content": "",
+        "stop_reason": null,
+        "tool_calls": [
+          "git_diff"
+        ]
+      },
+      "tool": "llm:fake-llm"
+    },
+    {
+      "args": {
+        "path": "app/auth.py"
+      },
+      "cost_usd": 0.0,
+      "is_error": false,
+      "kind": "tool",
+      "result": {
+        "content": {
+          "diff": "diff --git a/app/auth.py b/app/auth.py\n--- a/app/auth.py\n+++ b/app/auth.py\n@@ -10,3 +10,3 @@\n-    return session.user\n+    return session.user.id\n"
+        },
+        "error": null,
+        "ok": true
+      },
+      "tool": "git_diff"
+    },
+    {
+      "args": {
+        "messages": 4,
+        "temperature": 0.2
+      },
+      "cost_usd": 0.0096,
+      "is_error": false,
+      "kind": "llm",
+      "result": {
+        "content": "",
+        "stop_reason": null,
+        "tool_calls": [
+          "submit_triage"
+        ]
+      },
+      "tool": "llm:fake-llm"
+    },
+    {
+      "args": {
+        "decision": {
+          "category": "real_bug",
+          "confidence": 0.91,
+          "evidence": [
+            {
+              "quote": "AssertionError: expected 200 got 500",
+              "source": "log",
+              "why": "the test fails on the response status"
+            },
+            {
+              "quote": "return session.user.id",
+              "source": "diff",
+              "why": "the changed return value no longer matches the caller"
+            }
+          ],
+          "memory_note": null,
+          "needs_human": false,
+          "recommended_action": {
+            "params": {
+              "next_step": "Restore the user object or update the caller to use the id."
+            },
+            "type": "comment"
+          },
+          "summary": "`app/auth.py` now returns the user id instead of the user object, so the login endpoint returns 500."
+        }
+      },
+      "cost_usd": 0.0,
+      "is_error": false,
+      "kind": "action",
+      "result": {
+        "accepted": true
+      },
+      "tool": "submit_triage"
+    }
+  ],
+  "trigger_id": "pr_failure",
+  "usage": {
+    "input_tokens": 2800,
+    "output_tokens": 400
+  }
+}

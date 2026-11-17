@@ -221,6 +221,7 @@ class SnapshotMetadata(BaseModel):
     run_attempt: int
     workflow_name: str | None = None
     source: str
+    conclusion: str = "failure"
     head_sha: str | None = None
     base_sha: str | None = None
     pr_number: int | None = None
@@ -234,3 +235,108 @@ class SnapshotMetadata(BaseModel):
     memory_matches: int = 0
     diff_available: bool = False
     collected_at: datetime
+
+
+# ---------------------------------------------------------------------------
+# Runner contracts (Phase 2)
+# ---------------------------------------------------------------------------
+
+Category = Literal["flaky_test", "infra_issue", "dependency_or_config", "real_bug", "unknown"]
+EvidenceSource = Literal["log", "diff", "memory", "code"]
+RecommendedActionType = Literal["comment", "rerun", "fix_pr", "issue", "none"]
+RunnerStatus = Literal["succeeded", "failed", "budget_exceeded"]
+
+
+class Evidence(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    source: EvidenceSource
+    quote: str = Field(min_length=1)
+    why: str = Field(min_length=1)
+
+
+class RecommendedAction(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    type: RecommendedActionType = "none"
+    params: dict[str, Any] = Field(default_factory=dict)
+
+
+class TriageDecision(BaseModel):
+    """The exact object the model must pass to ``submit_triage``."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    category: Category
+    confidence: float = Field(ge=0.0, le=1.0)
+    summary: str = Field(min_length=1)
+    evidence: list[Evidence] = Field(default_factory=list)
+    memory_note: str | None = None
+    recommended_action: RecommendedAction = Field(default_factory=RecommendedAction)
+    needs_human: bool = False
+
+
+class ToolCall(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    name: str
+    arguments: dict[str, Any] = Field(default_factory=dict)
+
+
+class LLMMessage(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    role: Literal["system", "user", "assistant", "tool"]
+    content: str = ""
+    tool_calls: list[ToolCall] = Field(default_factory=list)
+    tool_call_id: str | None = None
+
+
+class TokenUsage(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    input_tokens: int = Field(default=0, ge=0)
+    output_tokens: int = Field(default=0, ge=0)
+
+
+class LLMResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    content: str = ""
+    tool_calls: list[ToolCall] = Field(default_factory=list)
+    stop_reason: str | None = None
+    usage: TokenUsage = Field(default_factory=TokenUsage)
+    model: str = ""
+    cost_usd: float = Field(default=0.0, ge=0.0)
+
+
+class ToolSpec(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: str
+    description: str
+    input_schema: dict[str, Any] = Field(default_factory=dict)
+
+
+class ToolResult(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    ok: bool
+    content: Any = None
+    error: str | None = None
+
+
+class RunnerStep(BaseModel):
+    """One audited unit of work: a model turn, a tool call, or an action."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    seq: int = Field(ge=1)
+    kind: Literal["llm", "tool", "action"]
+    tool: str
+    args: dict[str, Any] = Field(default_factory=dict)
+    result: Any = None
+    is_error: bool = False
+    latency_ms: int = 0
+    cost_usd: float = 0.0

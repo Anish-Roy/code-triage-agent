@@ -74,3 +74,4 @@ class GitHubIssueComment(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
     id: int
+    body: str = ""

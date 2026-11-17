@@ -1,0 +1,23 @@
+2026-11-05T10:00:00.1234567Z ##[group]Run actions/checkout@v4
+2026-11-05T10:00:00.1234567Z Syncing repository: acme/widgets
+2026-11-05T10:00:00.5000000Z HEAD is now at abc1234 feature/login
+2026-11-05T10:00:00.6000000Z ##[endgroup]
+2026-11-05T10:00:01.0000000Z ##[group]Set up job
+2026-11-05T10:00:01.1000000Z Python 3.13.0
+2026-11-05T10:00:01.2000000Z ##[endgroup]
+2026-11-05T10:00:02.0000000Z ##[group]Run pytest -q
+2026-11-05T10:00:02.1000000Z collected 42 items
+2026-11-05T10:00:02.2000000Z .....................................F....
+2026-11-05T10:00:03.1200000Z ================================== FAILURES ==================================
+2026-11-05T10:00:03.1200000Z _____________________________ test_login ______________________________
+2026-11-05T10:00:03.1200000Z
+2026-11-05T10:00:03.1200000Z     def test_login():
+2026-11-05T10:00:03.1200000Z >       assert response.status == 200
+2026-11-05T10:00:03.1200000Z E       AssertionError: expected 200 got 500
+2026-11-05T10:00:03.1200000Z
+2026-11-05T10:00:03.1200000Z tests/test_login.py:14: AssertionError
+2026-11-05T10:00:03.3000000Z ##[error]Process completed with exit code 1.
+2026-11-05T10:00:03.3000000Z ##[endgroup]
+2026-11-05T10:00:04.0000000Z ##[group]Post job cleanup.
+2026-11-05T10:00:04.1000000Z Cleaning up orphan processes
+2026-11-05T10:00:04.2000000Z ##[endgroup]

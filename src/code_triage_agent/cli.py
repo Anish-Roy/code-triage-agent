@@ -48,6 +48,20 @@ def _parser() -> argparse.ArgumentParser:
     worker.add_argument("--once", action="store_true", help="process at most one event")
     worker.add_argument("--poll-interval", type=float, default=2.0)
 
+    triage = subparsers.add_parser("triage", help="triage an input snapshot in replay mode")
+    triage.add_argument("--snapshot", type=Path, required=True, help="snapshot directory")
+    triage.add_argument(
+        "--script",
+        type=Path,
+        help="FakeLLM script (default: <snapshot>/llm_script.json)",
+    )
+    triage.add_argument("--skill", help="force a skill instead of routing the trigger")
+    triage.add_argument(
+        "--persist",
+        action="store_true",
+        help="write the run record when its event exists in the database",
+    )
+
     return parser
 
 
@@ -75,6 +89,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.command == "worker":
         configure_logging(settings.log_level)
         return _worker(settings, args)
+    if args.command == "triage":
+        configure_logging(settings.log_level)
+        return _triage(settings, args)
 
     parser.print_help()
     return 2
@@ -174,6 +191,57 @@ def _resolve_event(
                 run_attempt=run_attempt,
             )
     return event
+
+
+def _triage(settings: Settings, args: argparse.Namespace) -> int:
+    import json
+
+    from code_triage_agent.runner.llm import Pricing, load_script
+    from code_triage_agent.runner.pipeline import triage_snapshot
+
+    try:
+        config = load_config(settings.config_dir)
+    except ConfigError as exc:
+        print(f"INVALID: {exc}", file=sys.stderr)
+        return 1
+
+    script_path = args.script or (args.snapshot / "llm_script.json")
+    if not script_path.is_file():
+        print(
+            f"ERROR: replay script not found: {script_path}. "
+            "Phase 2 has no live provider client; pass --script.",
+            file=sys.stderr,
+        )
+        return 1
+
+    try:
+        llm = load_script(
+            script_path,
+            pricing=Pricing(
+                input_per_mtok=settings.llm_input_cost_per_mtok,
+                output_per_mtok=settings.llm_output_cost_per_mtok,
+            ),
+        )
+    except Exception as exc:
+        print(f"ERROR: could not load replay script: {exc}", file=sys.stderr)
+        return 1
+
+    replay_settings = settings.model_copy(update={"replay_mode": True, "dry_run": True})
+    try:
+        result = triage_snapshot(
+            snapshot_dir=args.snapshot,
+            settings=replay_settings,
+            config=config,
+            llm=llm,
+            persist=args.persist,
+            skill_override=args.skill,
+        )
+    except Exception as exc:
+        print(f"ERROR: triage failed: {exc}", file=sys.stderr)
+        return 1
+
+    print(json.dumps(result.artifact.to_dict(), indent=2, sort_keys=True))
+    return 0 if result.artifact.status == "succeeded" else 1
 
 
 def _worker(settings: Settings, args: argparse.Namespace) -> int:

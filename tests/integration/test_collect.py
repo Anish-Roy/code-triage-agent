@@ -329,6 +329,9 @@ def test_collector_never_imports_an_llm(
     project_config,  # type: ignore[no-untyped-def]
     settings,  # type: ignore[no-untyped-def]
 ) -> None:
+    # Another test may already have imported the runner; this test proves the
+    # collector itself does not pull the model layer in.
+    sys.modules.pop("code_triage_agent.runner.llm", None)
     _collector(
         client=FixtureGitHubClient(),
         config=project_config,

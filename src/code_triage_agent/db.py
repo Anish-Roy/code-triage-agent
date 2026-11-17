@@ -493,6 +493,14 @@ def record_step(
             run_id, seq, tool, args_json, result_json, is_error,
             latency_ms, cost_usd, created_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT (run_id, seq) DO UPDATE SET
+            tool = excluded.tool,
+            args_json = excluded.args_json,
+            result_json = excluded.result_json,
+            is_error = excluded.is_error,
+            latency_ms = excluded.latency_ms,
+            cost_usd = excluded.cost_usd,
+            created_at = excluded.created_at
         """,
         (
             run_id,

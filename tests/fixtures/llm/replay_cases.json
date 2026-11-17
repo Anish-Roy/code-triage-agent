@@ -1,0 +1,231 @@
+{
+  "cases": [
+    {
+      "case_id": "pr_real_bug",
+      "skill": "triage-pr-failure",
+      "source": "pull_request",
+      "conclusion": "failure",
+      "pr_number": 7,
+      "logs": "2026-11-05T10:00:02Z ================================== FAILURES ==================================\n2026-11-05T10:00:02Z _____________________________ test_login ______________________________\n2026-11-05T10:00:02Z >       assert response.status == 200\n2026-11-05T10:00:02Z E       AssertionError: expected 200 got 500\n2026-11-05T10:00:02Z tests/test_login.py:14: AssertionError\n",
+      "diff": "diff --git a/app/auth.py b/app/auth.py\n--- a/app/auth.py\n+++ b/app/auth.py\n@@ -10,3 +10,3 @@\n-    return session.user\n+    return session.user.id\n",
+      "reads": [{"name": "git_diff", "arguments": {"path": "app/auth.py"}}],
+      "decision": {
+        "category": "real_bug",
+        "confidence": 0.91,
+        "summary": "`app/auth.py` now returns the user id instead of the user object, so the login endpoint raises and returns 500.",
+        "evidence": [
+          {"source": "log", "quote": "AssertionError: expected 200 got 500", "why": "the test fails on the response status"},
+          {"source": "diff", "quote": "return session.user.id", "why": "the changed return value no longer matches the caller"}
+        ],
+        "recommended_action": {"type": "comment", "params": {"next_step": "Restore the user object or update the caller to use the id."}}
+      },
+      "expected_category": "real_bug"
+    },
+    {
+      "case_id": "pr_flaky_history",
+      "skill": "triage-pr-failure",
+      "source": "pull_request",
+      "conclusion": "failure",
+      "pr_number": 7,
+      "logs": "2026-11-05T10:00:02Z FAILED tests/test_cache.py::test_expiry - assert 0 > 5\n2026-11-05T10:00:02Z note: PASSED on retry at commit abc1234 after a clock skew warning\n",
+      "diff": "diff --git a/tests/test_cache.py b/tests/test_cache.py\n--- a/tests/test_cache.py\n+++ b/tests/test_cache.py\n@@ -1,2 +1,2 @@\n-def test_expiry():\n+def test_expiry() -> None:\n",
+      "memory": [
+        {
+          "signature": "sig_v1:test",
+          "repo": "acme/widgets",
+          "note": "test_expiry has failed intermittently on the shared runner and passed on rerun.",
+          "confidence": "high",
+          "evidence_runs": ["r_old_1", "r_old_2"],
+          "created_at": "2026-10-01T00:00:00Z",
+          "source": "human"
+        }
+      ],
+      "reads": [{"name": "search_memory", "arguments": {"signature": "sig_v1:test"}}],
+      "decision": {
+        "category": "flaky_test",
+        "confidence": 0.78,
+        "summary": "The test has a documented retry pass and matching memory history, so this looks flaky rather than a product regression.",
+        "evidence": [
+          {"source": "log", "quote": "PASSED on retry at commit abc1234", "why": "the same commit passed on retry"},
+          {"source": "memory", "quote": "passed on rerun", "why": "a prior run has the same signature and a rerun pass"}
+        ],
+        "recommended_action": {"type": "comment", "params": {"next_step": "Rerun the failed job once and watch the signature."}}
+      },
+      "expected_category": "flaky_test"
+    },
+    {
+      "case_id": "pr_infra_timeout",
+      "skill": "triage-pr-failure",
+      "source": "pull_request",
+      "conclusion": "timed_out",
+      "pr_number": 7,
+      "logs": "2026-11-05T10:00:02Z Running integration suite\n2026-11-05T10:00:02Z TimeoutError: integration suite exceeded 600s while waiting for the database\n2026-11-05T10:00:02Z ##[error]The operation was canceled.\n",
+      "diff": "",
+      "decision": {
+        "category": "infra_issue",
+        "confidence": 0.84,
+        "summary": "The integration suite timed out waiting for the database; the log shows no assertion or test-specific hang.",
+        "evidence": [
+          {"source": "log", "quote": "TimeoutError: integration suite exceeded 600s", "why": "a suite-level timeout, not an assertion failure"}
+        ],
+        "recommended_action": {"type": "comment", "params": {"next_step": "Rerun once; if the database timeout repeats, escalate to infrastructure."}}
+      },
+      "expected_category": "infra_issue"
+    },
+    {
+      "case_id": "pr_unknown_weak_evidence",
+      "skill": "triage-pr-failure",
+      "source": "pull_request",
+      "conclusion": "failure",
+      "pr_number": 7,
+      "logs": "2026-11-05T10:00:02Z FAILED tests/test_api.py::test_profile - assert None\n",
+      "diff": "",
+      "decision": {
+        "category": "unknown",
+        "confidence": 0.3,
+        "summary": "The trimmed log does not include the assertion context or a diff, so a human should inspect the full job.",
+        "evidence": [],
+        "needs_human": true,
+        "recommended_action": {"type": "comment", "params": {"next_step": "Open the full job log and inspect the profile test setup."}}
+      },
+      "expected_category": "unknown"
+    },
+    {
+      "case_id": "culprit_dependency",
+      "skill": "find-culprit",
+      "source": "push",
+      "conclusion": "failure",
+      "pr_number": 8,
+      "logs": "2026-11-05T10:00:02Z Collecting foo==2.0\n2026-11-05T10:00:02Z ERROR: Could not find a version that satisfies the requirement foo==2.0\n2026-11-05T10:00:02Z ##[error]Process completed with exit code 1.\n",
+      "diff": "diff --git a/pyproject.toml b/pyproject.toml\n--- a/pyproject.toml\n+++ b/pyproject.toml\n@@ -5,1 +5,1 @@\n-foo = \"1.9\"\n+foo = \"2.0\"\n",
+      "reads": [{"name": "git_diff", "arguments": {}}],
+      "decision": {
+        "category": "dependency_or_config",
+        "confidence": 0.93,
+        "summary": "The branch pins `foo==2.0`, which is not available to the installer.",
+        "evidence": [
+          {"source": "log", "quote": "Could not find a version that satisfies the requirement foo==2.0", "why": "dependency resolution failed"},
+          {"source": "diff", "quote": "foo = \"2.0\"", "why": "the dependency pin changed in this commit range"}
+        ],
+        "recommended_action": {"type": "comment", "params": {"next_step": "Pin an available `foo` version or publish 2.0."}}
+      },
+      "expected_category": "dependency_or_config"
+    },
+    {
+      "case_id": "culprit_real_bug",
+      "skill": "find-culprit",
+      "source": "push",
+      "conclusion": "failure",
+      "pr_number": 8,
+      "logs": "2026-11-05T10:00:02Z FAILED tests/test_profile.py::test_profile - TypeError\n2026-11-05T10:00:02Z TypeError: 'NoneType' object is not subscriptable\n",
+      "diff": "diff --git a/app/profile.py b/app/profile.py\n--- a/app/profile.py\n+++ b/app/profile.py\n@@ -20,2 +20,2 @@\n-    return user[\"name\"]\n+    return user.name\n",
+      "reads": [{"name": "git_diff", "arguments": {"path": "app/profile.py"}}],
+      "decision": {
+        "category": "real_bug",
+        "confidence": 0.88,
+        "summary": "The profile change dereferences a missing user object, producing the `NoneType` failure.",
+        "evidence": [
+          {"source": "log", "quote": "TypeError: 'NoneType' object is not subscriptable", "why": "the updated code assumes a user exists"},
+          {"source": "diff", "quote": "return user.name", "why": "the changed line touches the failing path"}
+        ],
+        "recommended_action": {"type": "comment", "params": {"next_step": "Guard the missing user or restore the previous lookup."}}
+      },
+      "expected_category": "real_bug"
+    },
+    {
+      "case_id": "nightly_infra",
+      "skill": "triage-nightly",
+      "source": "schedule",
+      "conclusion": "failure",
+      "pr_number": 9,
+      "logs": "2026-11-05T03:00:02Z Starting nightly build\n2026-11-05T03:00:02Z Connection reset by peer while downloading the toolchain\n2026-11-05T03:00:02Z ##[error]Process completed with exit code 1.\n",
+      "diff": "",
+      "decision": {
+        "category": "infra_issue",
+        "confidence": 0.81,
+        "summary": "The nightly job failed while downloading the toolchain, before tests ran.",
+        "evidence": [
+          {"source": "log", "quote": "Connection reset by peer", "why": "the failure is a network reset during setup"}
+        ],
+        "recommended_action": {"type": "comment", "params": {"next_step": "Rerun the nightly; escalate if the mirror keeps resetting."}}
+      },
+      "expected_category": "infra_issue"
+    },
+    {
+      "case_id": "nightly_flaky",
+      "skill": "triage-nightly",
+      "source": "schedule",
+      "conclusion": "failure",
+      "pr_number": 9,
+      "logs": "2026-11-05T03:00:02Z FAILED tests/e2e/test_browser.py::test_upload\n2026-11-05T03:00:02Z PASSED on rerun (attempt 2)\n",
+      "diff": "",
+      "memory": [
+        {
+          "signature": "sig_v1:test",
+          "note": "The browser upload test is timing-sensitive and passed on rerun twice this month.",
+          "confidence": "medium",
+          "evidence_runs": ["r_old_3"],
+          "created_at": "2026-10-20T00:00:00Z",
+          "source": "agent"
+        }
+      ],
+      "decision": {
+        "category": "flaky_test",
+        "confidence": 0.74,
+        "summary": "The browser upload test passed on rerun and has a recent flaky history.",
+        "evidence": [
+          {"source": "log", "quote": "PASSED on rerun (attempt 2)", "why": "the same nightly passed when rerun"},
+          {"source": "memory", "quote": "timing-sensitive", "why": "prior runs show the same pattern"}
+        ],
+        "recommended_action": {"type": "comment", "params": {"next_step": "Quarantine or stabilize the upload test."}}
+      },
+      "expected_category": "flaky_test"
+    },
+    {
+      "case_id": "propose_fix_dependency",
+      "skill": "propose-fix",
+      "override": true,
+      "source": "pull_request",
+      "conclusion": "failure",
+      "pr_number": 10,
+      "logs": "2026-11-05T10:00:02Z FAILED tests/test_lib.py::test_import\n2026-11-05T10:00:02Z ImportError: cannot import name 'new_api' from 'lib'\n",
+      "diff": "diff --git a/app/service.py b/app/service.py\n--- a/app/service.py\n+++ b/app/service.py\n@@ -1,1 +1,1 @@\n-from lib import new_api\n+from lib import old_api\n",
+      "files": {"files/app/service.py": "from lib import old_api\n\n\ndef run():\n    return old_api()\n"},
+      "reads": [{"name": "read_file", "arguments": {"path": "app/service.py"}}],
+      "decision": {
+        "category": "dependency_or_config",
+        "confidence": 0.86,
+        "summary": "The code imports `old_api`, which is absent from the installed `lib`; use the supported import or pin the compatible version.",
+        "evidence": [
+          {"source": "log", "quote": "cannot import name 'new_api' from 'lib'", "why": "the installed library does not export the expected symbol"},
+          {"source": "diff", "quote": "from lib import old_api", "why": "the import changed in this pull request"}
+        ],
+        "recommended_action": {"type": "comment", "params": {"next_step": "Align the import with the installed `lib` version."}}
+      },
+      "expected_category": "dependency_or_config"
+    },
+    {
+      "case_id": "propose_fix_real_bug",
+      "skill": "propose-fix",
+      "override": true,
+      "source": "pull_request",
+      "conclusion": "failure",
+      "pr_number": 10,
+      "logs": "2026-11-05T10:00:02Z FAILED tests/test_orders.py::test_total\n2026-11-05T10:00:02Z KeyError: 'user_id'\n",
+      "diff": "diff --git a/app/orders.py b/app/orders.py\n--- a/app/orders.py\n+++ b/app/orders.py\n@@ -8,2 +8,2 @@\n-    return order[\"user_id\"]\n+    return order[\"userId\"]\n",
+      "files": {"files/app/orders.py": "def user_for(order):\n    return order[\"userId\"]\n"},
+      "reads": [{"name": "read_file", "arguments": {"path": "app/orders.py"}}],
+      "decision": {
+        "category": "real_bug",
+        "confidence": 0.9,
+        "summary": "The order lookup now reads `userId`, but the payload still provides `user_id`; restore the key or normalize the payload.",
+        "evidence": [
+          {"source": "log", "quote": "KeyError: 'user_id'", "why": "the failing code expects the old key"},
+          {"source": "diff", "quote": "return order[\"userId\"]", "why": "the changed key does not match the payload"}
+        ],
+        "recommended_action": {"type": "comment", "params": {"next_step": "Use `order[\"user_id\"]` or normalize the incoming payload."}}
+      },
+      "expected_category": "real_bug"
+    }
+  ]
+}

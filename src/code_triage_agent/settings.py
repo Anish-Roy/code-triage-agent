@@ -32,6 +32,11 @@ class Settings(BaseSettings):
     llm_provider: str = "anthropic"
     llm_model: str = ""
     llm_api_key: SecretStr | None = None
+    # Pricing is expressed in USD per million tokens so cost can be audited
+    # per run without asking the provider for a bill.
+    llm_input_cost_per_mtok: float = Field(default=3.0, ge=0.0)
+    llm_output_cost_per_mtok: float = Field(default=15.0, ge=0.0)
+    llm_timeout_seconds: float = Field(default=60.0, gt=0, le=600)
 
     config_dir: Path = Path("config")
     database_path: Path = Path("var/triage.db")

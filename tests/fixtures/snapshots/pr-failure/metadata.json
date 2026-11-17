@@ -1,0 +1,37 @@
+{
+  "base_sha": "def5678",
+  "collected_at": "2026-11-05T10:00:00Z",
+  "conclusion": "failure",
+  "config_sha": "golden-config-sha",
+  "delivery_id": "delivery-golden",
+  "diff_available": false,
+  "dropped_jobs": 0,
+  "event_id": 1,
+  "failed_jobs": [
+    {
+      "conclusion": "failure",
+      "failed_steps": [
+        {
+          "conclusion": "failure",
+          "name": "Run pytest",
+          "number": 3
+        }
+      ],
+      "job_id": 5001,
+      "name": "tests"
+    }
+  ],
+  "head_sha": "abc1234",
+  "memory_matches": 0,
+  "pr_number": 7,
+  "redaction_counts": {},
+  "repo": "acme/widgets",
+  "run_attempt": 1,
+  "run_id": "r_golden",
+  "signature": "sig_v1:golden",
+  "source": "pull_request",
+  "total_bytes": 0,
+  "trim": [],
+  "workflow_name": "CI",
+  "workflow_run_id": 9001
+}

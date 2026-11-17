@@ -221,6 +221,7 @@ class Collector:
             run_attempt=event.run_attempt,
             workflow_name=run_detail.name,
             source=wrapped.source,
+            conclusion=event.conclusion,
             head_sha=run_detail.head_sha,
             base_sha=base_sha,
             pr_number=pr_number,

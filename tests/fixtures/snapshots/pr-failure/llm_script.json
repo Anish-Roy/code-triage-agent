@@ -1,0 +1,52 @@
+{
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "name": "git_diff",
+          "arguments": {
+            "path": "app/auth.py"
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 1200,
+        "output_tokens": 80
+      }
+    },
+    {
+      "tool_calls": [
+        {
+          "name": "submit_triage",
+          "arguments": {
+            "category": "real_bug",
+            "confidence": 0.91,
+            "summary": "`app/auth.py` now returns the user id instead of the user object, so the login endpoint returns 500.",
+            "evidence": [
+              {
+                "source": "log",
+                "quote": "AssertionError: expected 200 got 500",
+                "why": "the test fails on the response status"
+              },
+              {
+                "source": "diff",
+                "quote": "return session.user.id",
+                "why": "the changed return value no longer matches the caller"
+              }
+            ],
+            "recommended_action": {
+              "type": "comment",
+              "params": {
+                "next_step": "Restore the user object or update the caller to use the id."
+              }
+            }
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 1600,
+        "output_tokens": 320
+      }
+    }
+  ]
+}

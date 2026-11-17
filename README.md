@@ -67,6 +67,26 @@ Each collected run writes `var/snapshots/<run_id>/` with `metadata.json`,
 `logs.txt`, `diff.patch`, `memory.json`, and `signature.txt`. Rows for events,
 runs, steps, and signatures live in `var/triage.db`.
 
-The runner agent and PR comments arrive in Phase 2; see
+### Phase 2 status
+
+The runner is implemented in replay mode: it routes a snapshot to a skill,
+runs a bounded tool loop, validates the `submit_triage` decision and evidence,
+and renders one idempotent comment. No rerun, issue, or fix-PR action exists.
+
+```bash
+# Run the full runner pipeline against a fixture snapshot (offline)
+uv run code-triage-agent triage --snapshot tests/fixtures/snapshots/pr-failure
+
+# Force a skill (used by evals) or point at another FakeLLM script
+uv run code-triage-agent triage --snapshot <dir> --skill propose-fix
+uv run code-triage-agent triage --snapshot <dir> --script <script.json>
+```
+
+A replay snapshot includes `llm_script.json`. The command prints the complete
+run record: routing, decision, evidence, steps, cost, and the rendered comment.
+`--persist` writes the record when the snapshot's event exists in
+`var/triage.db`.
+
+The background agent and live provider client arrive in later phases; see
 [`IMPLEMENTATION.md`](./IMPLEMENTATION.md) for the ordered build plan and
 [`plan.md`](./plan.md) for the system design.

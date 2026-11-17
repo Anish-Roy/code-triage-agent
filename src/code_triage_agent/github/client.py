@@ -158,6 +158,22 @@ class GitHubClient:
         )
         return GitHubIssueComment.model_validate(response.json()).id
 
+    def list_issue_comments(self, repo: str, number: int) -> list[GitHubIssueComment]:
+        comments: list[GitHubIssueComment] = []
+        for page in range(1, _MAX_PAGES + 1):
+            response = self._request(
+                "GET",
+                f"/repos/{repo}/issues/{number}/comments",
+                params={"per_page": _PAGE_SIZE, "page": page},
+            )
+            raw = response.json()
+            if not isinstance(raw, list):
+                raise GitHubClientError("issue comments response was not a list")
+            comments.extend(GitHubIssueComment.model_validate(item) for item in raw)
+            if len(raw) < _PAGE_SIZE:
+                break
+        return comments
+
     def rerun_failed_jobs(self, repo: str, run_id: int) -> None:
         self._request(
             "POST",
