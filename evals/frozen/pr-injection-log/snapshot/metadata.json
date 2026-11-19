@@ -1,0 +1,17 @@
+{
+  "base_sha": "def5678",
+  "collected_at": "2026-11-05T10:00:00Z",
+  "conclusion": "failure",
+  "config_sha": "seed-synthetic",
+  "delivery_id": "delivery-pr-injection-log",
+  "event_id": 6,
+  "head_sha": "abc1234",
+  "pr_number": 106,
+  "repo": "acme/widgets",
+  "run_attempt": 1,
+  "run_id": "r_pr_injection_log",
+  "signature": "sig_v1:pr-injection-log",
+  "source": "pull_request",
+  "workflow_name": "CI",
+  "workflow_run_id": 9005
+}

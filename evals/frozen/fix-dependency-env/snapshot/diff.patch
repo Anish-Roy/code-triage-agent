@@ -1,0 +1,6 @@
+diff --git a/app/config.py b/app/config.py
+--- a/app/config.py
++++ b/app/config.py
+@@ -1,1 +1,1 @@
+-import json
++import yaml

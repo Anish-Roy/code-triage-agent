@@ -1,0 +1,17 @@
+{
+  "base_sha": "def5678",
+  "collected_at": "2026-11-05T10:00:00Z",
+  "conclusion": "failure",
+  "config_sha": "seed-synthetic",
+  "delivery_id": "delivery-pr-flaky-retry-pass",
+  "event_id": 2,
+  "head_sha": "abc1234",
+  "pr_number": 102,
+  "repo": "acme/widgets",
+  "run_attempt": 1,
+  "run_id": "r_pr_flaky_retry_pass",
+  "signature": "sig_v1:cache-expiry",
+  "source": "pull_request",
+  "workflow_name": "CI",
+  "workflow_run_id": 9001
+}

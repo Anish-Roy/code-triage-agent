@@ -1,0 +1,16 @@
+{
+  "case_id": "pr-flaky-retry-pass",
+  "expected_action": "comment",
+  "expected_category": "flaky_test",
+  "expected_skill": "triage-pr-failure",
+  "hard_boundary": true,
+  "labeler": "seed-synthetic",
+  "notes": "Synthetic seed case generated from the Phase 2 replay fixtures; pending human confirmation.",
+  "reviewed_at": "2026-11-18T12:00:00Z",
+  "reviewer": "reviewer-b",
+  "snapshot_path": "snapshot",
+  "tags": [
+    "smoke",
+    "flaky_test"
+  ]
+}

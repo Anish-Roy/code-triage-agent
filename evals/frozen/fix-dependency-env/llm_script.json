@@ -1,0 +1,45 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "path": "app/config.py"
+          },
+          "name": "read_file"
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "dependency_or_config",
+            "confidence": 0.85,
+            "evidence": [
+              {
+                "quote": "No module named 'yaml'",
+                "source": "log",
+                "why": "the runtime dependency is missing"
+              },
+              {
+                "quote": "import yaml",
+                "source": "diff",
+                "why": "the import was introduced in this pull request"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Add PyYAML to the dependencies or keep using the JSON loader."
+              },
+              "type": "comment"
+            },
+            "summary": "`PyYAML` is not installed in this environment, so importing `yaml` fails before the config loads."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

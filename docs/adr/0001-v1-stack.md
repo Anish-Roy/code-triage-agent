@@ -55,6 +55,22 @@ tool step, and a configuration surface that can be changed safely.
   tool and prompt contracts exist.
 - Temperature is `0` for replay and evaluation.
 
+#### Phase 3 provider decision
+
+- **Anthropic Messages API through `httpx`** is the one live adapter
+  (`AnthropicLLM`). No vendor SDK is imported, so the dependency and attack
+  surface stay small and the adapter remains easy to swap.
+- The model id is pinned per run with `CTA_LLM_MODEL`; pricing is configured with
+  `CTA_LLM_INPUT_COST_PER_MTOK` / `CTA_LLM_OUTPUT_COST_PER_MTOK` so a report can
+  audit cost without asking the provider.
+- `CachedLLM` records and replays responses keyed by model, messages, tools,
+  temperature, and an explicit namespace. A changed skill prompt changes the key
+  and therefore cannot silently reuse an old response.
+- `CTA_LLM_API_KEY` is optional everywhere except an explicit live run. Tests,
+  `make check`, PR smoke, and the scripted nightly eval must never require it.
+- Eval runs carry a separate ceiling (`CTA_EVAL_BUDGET_USD`, default $15) in
+  addition to the per-run `max_cost_usd` guard.
+
 ### Configuration
 
 - `config/` lives in this repo for v1: `triggers.yaml`, `skills/*.md`, and

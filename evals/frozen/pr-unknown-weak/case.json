@@ -1,0 +1,15 @@
+{
+  "case_id": "pr-unknown-weak",
+  "expected_action": "none",
+  "expected_category": "unknown",
+  "expected_skill": "triage-pr-failure",
+  "hard_boundary": false,
+  "labeler": "seed-synthetic",
+  "notes": "Synthetic seed case generated from the Phase 2 replay fixtures; pending human confirmation.",
+  "reviewed_at": "2026-11-18T12:00:00Z",
+  "reviewer": "reviewer-b",
+  "snapshot_path": "snapshot",
+  "tags": [
+    "unknown"
+  ]
+}

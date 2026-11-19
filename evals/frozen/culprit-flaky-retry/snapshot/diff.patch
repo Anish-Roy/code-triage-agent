@@ -1,0 +1,6 @@
+diff --git a/tests/test_time.py b/tests/test_time.py
+--- a/tests/test_time.py
++++ b/tests/test_time.py
+@@ -1,1 +1,1 @@
+-def test_zone():
++def test_zone() -> None:

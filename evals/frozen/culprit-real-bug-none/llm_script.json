@@ -1,0 +1,35 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "real_bug",
+            "confidence": 0.9,
+            "evidence": [
+              {
+                "quote": "TypeError: 'NoneType' object is not subscriptable",
+                "source": "log",
+                "why": "the updated code assumes a user exists"
+              },
+              {
+                "quote": "return user.name",
+                "source": "diff",
+                "why": "the changed line touches the failing path"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Guard the missing user or restore the previous lookup."
+              },
+              "type": "comment"
+            },
+            "summary": "The profile change dereferences a missing user object, producing the `NoneType` failure."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

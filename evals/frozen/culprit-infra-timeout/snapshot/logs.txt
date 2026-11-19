@@ -1,0 +1,3 @@
+2026-11-05T10:00:02Z Building wheels for collected packages
+2026-11-05T10:00:02Z TimeoutError: build runner lost network after 600s
+2026-11-05T10:00:02Z ##[error]The operation was canceled.

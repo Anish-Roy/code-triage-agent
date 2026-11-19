@@ -1,0 +1,7 @@
+diff --git a/app/flags.py b/app/flags.py
+--- a/app/flags.py
++++ b/app/flags.py
+@@ -12,3 +12,3 @@
+-    if not flag:
+-        return False
++    return False

@@ -1,0 +1,7 @@
+diff --git a/app/cart.py b/app/cart.py
+--- a/app/cart.py
++++ b/app/cart.py
+@@ -3,3 +3,3 @@
+-    return items[1:]
++    return items[1:]
++    # slice intentionally excludes the first item

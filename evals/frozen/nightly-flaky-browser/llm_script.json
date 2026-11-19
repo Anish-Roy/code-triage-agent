@@ -1,0 +1,35 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "flaky_test",
+            "confidence": 0.78,
+            "evidence": [
+              {
+                "quote": "PASSED on rerun (attempt 2)",
+                "source": "log",
+                "why": "the same nightly passed when rerun"
+              },
+              {
+                "quote": "timing-sensitive",
+                "source": "memory",
+                "why": "prior runs show the same pattern"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Quarantine or stabilize the upload test."
+              },
+              "type": "comment"
+            },
+            "summary": "The browser upload test passed on rerun and has a recent flaky history."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

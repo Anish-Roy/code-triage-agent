@@ -1,0 +1,17 @@
+{
+  "base_sha": "def5678",
+  "collected_at": "2026-11-05T10:00:00Z",
+  "conclusion": "failure",
+  "config_sha": "seed-synthetic",
+  "delivery_id": "delivery-culprit-unknown-no-diff",
+  "event_id": 13,
+  "head_sha": "abc1234",
+  "pr_number": 205,
+  "repo": "acme/widgets",
+  "run_attempt": 1,
+  "run_id": "r_culprit_unknown_no_diff",
+  "signature": "sig_v1:culprit-unknown-no-diff",
+  "source": "push",
+  "workflow_name": "CI",
+  "workflow_run_id": 9012
+}

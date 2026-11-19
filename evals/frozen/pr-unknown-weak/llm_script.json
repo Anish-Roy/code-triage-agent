@@ -1,0 +1,25 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "unknown",
+            "confidence": 0.3,
+            "evidence": [],
+            "needs_human": true,
+            "recommended_action": {
+              "params": {
+                "next_step": "Open the full job log and inspect the profile test setup."
+              },
+              "type": "none"
+            },
+            "summary": "The trimmed log has no assertion context and there is no diff, so a human should inspect the full job."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

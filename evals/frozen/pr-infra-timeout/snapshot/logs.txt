@@ -1,0 +1,3 @@
+2026-11-05T10:00:02Z Running integration suite
+2026-11-05T10:00:02Z TimeoutError: integration suite exceeded 600s while waiting for the database
+2026-11-05T10:00:02Z ##[error]The operation was canceled.

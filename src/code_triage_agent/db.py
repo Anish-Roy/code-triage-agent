@@ -18,13 +18,18 @@ from pathlib import Path
 from typing import Any, cast
 
 from code_triage_agent.models import (
+    EvalRecord,
     EventRecord,
+    OutcomeCheckRecord,
+    OutcomeLabel,
+    OutcomeRecord,
     RunRecord,
     SignatureRecord,
     StepRecord,
+    TriageDecision,
 )
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 _SCHEMA_PATH = Path(__file__).with_name("schema.sql")
 _MIGRATIONS_DIR = Path(__file__).with_name("migrations")
 _migration_lock = threading.Lock()
@@ -406,6 +411,8 @@ def finish_run(
     skill_id: str | None = None,
     skill_version: str | None = None,
     config_sha: str | None = None,
+    predicted_action: str | None = None,
+    decision: TriageDecision | None = None,
     now: datetime | None = None,
 ) -> RunRecord | None:
     connection.execute(
@@ -423,6 +430,8 @@ def finish_run(
             skill_id = COALESCE(?, skill_id),
             skill_version = COALESCE(?, skill_version),
             config_sha = COALESCE(?, config_sha),
+            predicted_action = COALESCE(?, predicted_action),
+            decision_json = COALESCE(?, decision_json),
             finished_at = ?
         WHERE id = ?
         """,
@@ -439,6 +448,8 @@ def finish_run(
             skill_id,
             skill_version,
             config_sha,
+            predicted_action,
+            json.dumps(decision.model_dump(mode="json")) if decision is not None else None,
             to_iso(now or utcnow()),
             run_id,
         ),
@@ -456,6 +467,8 @@ def list_runs(
     *,
     event_id: int | None = None,
     status: str | None = None,
+    skill_id: str | None = None,
+    outcome: str | None = None,
     limit: int = 100,
 ) -> list[RunRecord]:
     clauses: list[str] = []
@@ -466,6 +479,12 @@ def list_runs(
     if status is not None:
         clauses.append("status = ?")
         parameters.append(status)
+    if skill_id is not None:
+        clauses.append("skill_id = ?")
+        parameters.append(skill_id)
+    if outcome is not None:
+        clauses.append("outcome = ?")
+        parameters.append(outcome)
     where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
     parameters.append(limit)
     rows = connection.execute(
@@ -526,11 +545,15 @@ def list_steps(connection: sqlite3.Connection, run_id: str) -> list[StepRecord]:
 def _run_from_row(row: sqlite3.Row) -> RunRecord:
     data = _row_dict(row)
     actions = json.loads(cast(str, data.pop("actions_json") or "[]"))
+    decision_raw = data.pop("decision_json", None)
+    decision = json.loads(cast(str, decision_raw)) if decision_raw else None
     return RunRecord.model_validate(
         {
             **data,
             "actions": actions,
+            "decision": decision,
             "finished_at": parse_iso(cast(str | None, data.get("finished_at"))),
+            "outcome_checked_at": parse_iso(cast(str | None, data.get("outcome_checked_at"))),
         }
     )
 
@@ -601,5 +624,341 @@ def _signature_from_row(row: sqlite3.Row) -> SignatureRecord:
             **data,
             "first_seen": parse_iso(cast(str, data["first_seen"])),
             "last_seen": parse_iso(cast(str, data["last_seen"])),
+        }
+    )
+
+
+# ---------------------------------------------------------------------------
+# Outcomes
+# ---------------------------------------------------------------------------
+
+
+def update_run_outcome(
+    connection: sqlite3.Connection,
+    run_id: str,
+    *,
+    outcome: OutcomeLabel,
+    checked_at: datetime | None = None,
+) -> RunRecord | None:
+    timestamp = to_iso(checked_at or utcnow())
+    connection.execute(
+        """
+        UPDATE runs
+        SET outcome = ?, outcome_checked_at = ?
+        WHERE id = ?
+        """,
+        (outcome, timestamp, run_id),
+    )
+    return get_run(connection, run_id)
+
+
+def upsert_outcome(
+    connection: sqlite3.Connection,
+    *,
+    run_id: str,
+    label: OutcomeLabel,
+    signals: dict[str, Any],
+    evidence: dict[str, Any],
+    terminal: bool = False,
+    now: datetime | None = None,
+) -> OutcomeRecord:
+    timestamp = to_iso(now or utcnow())
+    connection.execute(
+        """
+        INSERT INTO outcomes (
+            run_id, label, signals_json, evidence_json, collected_at, updated_at, terminal
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT (run_id) DO UPDATE SET
+            label = excluded.label,
+            signals_json = excluded.signals_json,
+            evidence_json = excluded.evidence_json,
+            updated_at = excluded.updated_at,
+            terminal = excluded.terminal
+        """,
+        (
+            run_id,
+            label,
+            json.dumps(signals, sort_keys=True),
+            json.dumps(evidence, sort_keys=True),
+            timestamp,
+            timestamp,
+            1 if terminal else 0,
+        ),
+    )
+    record = get_outcome(connection, run_id)
+    if record is None:  # pragma: no cover - guarded by the upsert above
+        raise RuntimeError(f"outcome {run_id} disappeared after upsert")
+    return record
+
+
+def get_outcome(connection: sqlite3.Connection, run_id: str) -> OutcomeRecord | None:
+    row = connection.execute("SELECT * FROM outcomes WHERE run_id = ?", (run_id,)).fetchone()
+    return _outcome_from_row(row) if row is not None else None
+
+
+def list_outcomes(
+    connection: sqlite3.Connection,
+    *,
+    label: OutcomeLabel | None = None,
+    limit: int = 100,
+) -> list[OutcomeRecord]:
+    if label is None:
+        rows = connection.execute(
+            "SELECT * FROM outcomes ORDER BY collected_at DESC LIMIT ?", (limit,)
+        ).fetchall()
+    else:
+        rows = connection.execute(
+            "SELECT * FROM outcomes WHERE label = ? ORDER BY collected_at DESC LIMIT ?",
+            (label, limit),
+        ).fetchall()
+    return [_outcome_from_row(row) for row in rows]
+
+
+def _outcome_from_row(row: sqlite3.Row) -> OutcomeRecord:
+    data = _row_dict(row)
+    return OutcomeRecord.model_validate(
+        {
+            "run_id": data["run_id"],
+            "label": data["label"],
+            "signals": json.loads(cast(str, data.get("signals_json") or "{}")),
+            "evidence": json.loads(cast(str, data.get("evidence_json") or "{}")),
+            "collected_at": parse_iso(cast(str, data["collected_at"])),
+            "updated_at": parse_iso(cast(str | None, data.get("updated_at"))),
+            "terminal": bool(data.get("terminal")),
+        }
+    )
+
+
+def upsert_outcome_check(
+    connection: sqlite3.Connection,
+    *,
+    run_id: str,
+    attempts: int,
+    first_checked_at: datetime | None,
+    last_checked_at: datetime | None,
+    next_check_at: datetime | None,
+    terminal: bool,
+    error: str | None = None,
+) -> OutcomeCheckRecord:
+    connection.execute(
+        """
+        INSERT INTO outcome_checks (
+            run_id, attempts, first_checked_at, last_checked_at,
+            next_check_at, terminal, error
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT (run_id) DO UPDATE SET
+            attempts = excluded.attempts,
+            first_checked_at = COALESCE(outcome_checks.first_checked_at, excluded.first_checked_at),
+            last_checked_at = excluded.last_checked_at,
+            next_check_at = excluded.next_check_at,
+            terminal = excluded.terminal,
+            error = excluded.error
+        """,
+        (
+            run_id,
+            attempts,
+            to_iso(first_checked_at) if first_checked_at else None,
+            to_iso(last_checked_at) if last_checked_at else None,
+            to_iso(next_check_at) if next_check_at else None,
+            1 if terminal else 0,
+            error[:4000] if error else None,
+        ),
+    )
+    record = get_outcome_check(connection, run_id)
+    if record is None:  # pragma: no cover - guarded by the upsert above
+        raise RuntimeError(f"outcome check {run_id} disappeared after upsert")
+    return record
+
+
+def get_outcome_check(connection: sqlite3.Connection, run_id: str) -> OutcomeCheckRecord | None:
+    row = connection.execute("SELECT * FROM outcome_checks WHERE run_id = ?", (run_id,)).fetchone()
+    return _outcome_check_from_row(row) if row is not None else None
+
+
+def _outcome_check_from_row(row: sqlite3.Row) -> OutcomeCheckRecord:
+    data = _row_dict(row)
+    return OutcomeCheckRecord.model_validate(
+        {
+            "run_id": data["run_id"],
+            "attempts": data.get("attempts", 0),
+            "first_checked_at": parse_iso(cast(str | None, data.get("first_checked_at"))),
+            "last_checked_at": parse_iso(cast(str | None, data.get("last_checked_at"))),
+            "next_check_at": parse_iso(cast(str | None, data.get("next_check_at"))),
+            "terminal": bool(data.get("terminal")),
+            "error": data.get("error"),
+        }
+    )
+
+
+def list_due_outcome_runs(
+    connection: sqlite3.Connection,
+    *,
+    now: datetime | None = None,
+    limit: int = 50,
+    window_days: int = 7,
+) -> list[RunRecord]:
+    """Finished runs that are still unresolved and due for an outcome check.
+
+    Old runs are still returned so the collector can mark them terminal once;
+    the collector is the place that enforces the seven-day recurrence window.
+    """
+    timestamp = now or utcnow()
+    cutoff = timestamp - timedelta(days=window_days)
+    rows = connection.execute(
+        """
+        SELECT r.* FROM runs AS r
+        LEFT JOIN outcomes AS o ON o.run_id = r.id
+        LEFT JOIN outcome_checks AS c ON c.run_id = r.id
+        WHERE r.status != 'running'
+          AND r.finished_at IS NOT NULL
+          AND r.finished_at >= ?
+          AND o.run_id IS NULL
+          AND (c.terminal IS NULL OR c.terminal = 0)
+          AND (c.next_check_at IS NULL OR c.next_check_at <= ?)
+        ORDER BY r.finished_at ASC
+        LIMIT ?
+        """,
+        (to_iso(cutoff), to_iso(timestamp), limit),
+    ).fetchall()
+    return [_run_from_row(row) for row in rows]
+
+
+def list_expired_outcome_runs(
+    connection: sqlite3.Connection,
+    *,
+    now: datetime | None = None,
+    window_days: int = 7,
+    limit: int = 200,
+) -> list[RunRecord]:
+    """Finished unresolved runs whose seven-day outcome window has closed.
+
+    The collector marks these terminal exactly once. They are deliberately not
+    polled: there is no remaining recurrence window in which a new signal could
+    change the label.
+    """
+    timestamp = now or utcnow()
+    cutoff = timestamp - timedelta(days=window_days)
+    rows = connection.execute(
+        """
+        SELECT r.* FROM runs AS r
+        LEFT JOIN outcomes AS o ON o.run_id = r.id
+        LEFT JOIN outcome_checks AS c ON c.run_id = r.id
+        WHERE r.status != 'running'
+          AND r.finished_at IS NOT NULL
+          AND r.finished_at < ?
+          AND o.run_id IS NULL
+          AND (c.terminal IS NULL OR c.terminal = 0)
+        ORDER BY r.finished_at ASC
+        LIMIT ?
+        """,
+        (to_iso(cutoff), limit),
+    ).fetchall()
+    return [_run_from_row(row) for row in rows]
+
+
+def list_runs_for_signature(
+    connection: sqlite3.Connection,
+    *,
+    signature: str,
+    after: datetime,
+    before: datetime,
+    exclude_run_id: str | None = None,
+) -> list[RunRecord]:
+    clauses = ["signature = ?", "started_at >= ?", "started_at <= ?"]
+    parameters: list[Any] = [signature, to_iso(after), to_iso(before)]
+    if exclude_run_id is not None:
+        clauses.append("id != ?")
+        parameters.append(exclude_run_id)
+    rows = connection.execute(
+        f"SELECT * FROM runs WHERE {' AND '.join(clauses)} ORDER BY started_at ASC",
+        parameters,
+    ).fetchall()
+    return [_run_from_row(row) for row in rows]
+
+
+# ---------------------------------------------------------------------------
+# Evals index (case.json remains authoritative)
+# ---------------------------------------------------------------------------
+
+
+def upsert_eval(
+    connection: sqlite3.Connection,
+    *,
+    case_id: str,
+    set_name: str,
+    snapshot_path: str,
+    expected_category: str | None = None,
+    expected_action: str | None = None,
+    notes: str | None = None,
+    labeler: str | None = None,
+    reviewer: str | None = None,
+    now: datetime | None = None,
+) -> EvalRecord:
+    timestamp = to_iso(now or utcnow())
+    connection.execute(
+        """
+        INSERT INTO evals (
+            case_id, set_name, snapshot_path, expected_category, expected_action,
+            notes, labeler, reviewer, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT (case_id) DO UPDATE SET
+            set_name = excluded.set_name,
+            snapshot_path = excluded.snapshot_path,
+            expected_category = excluded.expected_category,
+            expected_action = excluded.expected_action,
+            notes = excluded.notes,
+            labeler = excluded.labeler,
+            reviewer = excluded.reviewer,
+            updated_at = excluded.updated_at
+        """,
+        (
+            case_id,
+            set_name,
+            snapshot_path,
+            expected_category,
+            expected_action,
+            notes,
+            labeler,
+            reviewer,
+            timestamp,
+            timestamp,
+        ),
+    )
+    record = get_eval(connection, case_id)
+    if record is None:  # pragma: no cover - guarded by the upsert above
+        raise RuntimeError(f"eval {case_id} disappeared after upsert")
+    return record
+
+
+def get_eval(connection: sqlite3.Connection, case_id: str) -> EvalRecord | None:
+    row = connection.execute("SELECT * FROM evals WHERE case_id = ?", (case_id,)).fetchone()
+    return _eval_from_row(row) if row is not None else None
+
+
+def list_evals(
+    connection: sqlite3.Connection,
+    *,
+    set_name: str | None = None,
+    limit: int = 200,
+) -> list[EvalRecord]:
+    if set_name is None:
+        rows = connection.execute(
+            "SELECT * FROM evals ORDER BY case_id LIMIT ?", (limit,)
+        ).fetchall()
+    else:
+        rows = connection.execute(
+            "SELECT * FROM evals WHERE set_name = ? ORDER BY case_id LIMIT ?",
+            (set_name, limit),
+        ).fetchall()
+    return [_eval_from_row(row) for row in rows]
+
+
+def _eval_from_row(row: sqlite3.Row) -> EvalRecord:
+    data = _row_dict(row)
+    return EvalRecord.model_validate(
+        {
+            **data,
+            "created_at": parse_iso(cast(str | None, data.get("created_at"))),
+            "updated_at": parse_iso(cast(str | None, data.get("updated_at"))),
         }
     )

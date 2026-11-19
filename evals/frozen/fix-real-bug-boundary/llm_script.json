@@ -1,0 +1,45 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "path": "app/flags.py"
+          },
+          "name": "read_file"
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "real_bug",
+            "confidence": 0.91,
+            "evidence": [
+              {
+                "quote": "assert True is False",
+                "source": "log",
+                "why": "the enabled flag deterministically returns False"
+              },
+              {
+                "quote": "return False",
+                "source": "diff",
+                "why": "the changed function now always returns False"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Restore the conditional or return the flag value."
+              },
+              "type": "comment"
+            },
+            "summary": "The diff removes the conditional and always returns `False`, so the retry pass is incidental."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

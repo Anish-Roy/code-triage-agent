@@ -1,0 +1,45 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "path": "app/inventory.py"
+          },
+          "name": "read_file"
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "real_bug",
+            "confidence": 0.92,
+            "evidence": [
+              {
+                "quote": "assert [2, 1] == [1, 2]",
+                "source": "log",
+                "why": "the caller's list order changed"
+              },
+              {
+                "quote": "items.sort()",
+                "source": "diff",
+                "why": "the new sort mutates the input list"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Return a sorted copy instead of mutating the caller's list."
+              },
+              "type": "comment"
+            },
+            "summary": "The helper now sorts the caller's list in place, mutating shared state and changing the observed order."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

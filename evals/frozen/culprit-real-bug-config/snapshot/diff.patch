@@ -1,0 +1,6 @@
+diff --git a/app/settings.py b/app/settings.py
+--- a/app/settings.py
++++ b/app/settings.py
+@@ -4,1 +4,1 @@
+-os.environ["DATABASE_URL"]
++os.environ["DATABASEURL"]

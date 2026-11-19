@@ -1,0 +1,45 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "path": "app/orders.py"
+          },
+          "name": "read_file"
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "real_bug",
+            "confidence": 0.9,
+            "evidence": [
+              {
+                "quote": "KeyError: 'user_id'",
+                "source": "log",
+                "why": "the failing code expects the old key"
+              },
+              {
+                "quote": "return order[\"userId\"]",
+                "source": "diff",
+                "why": "the changed key does not match the payload"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Use `order[\"user_id\"]` or normalize the incoming payload."
+              },
+              "type": "comment"
+            },
+            "summary": "The order lookup now reads `userId`, but the payload still provides `user_id`; restore the key or normalize the payload."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

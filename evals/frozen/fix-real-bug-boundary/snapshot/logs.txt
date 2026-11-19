@@ -1,0 +1,2 @@
+2026-11-05T10:00:02Z FAILED tests/test_flags.py::test_enabled - assert True is False
+2026-11-05T10:00:02Z note: passed on rerun once when the cache was cold

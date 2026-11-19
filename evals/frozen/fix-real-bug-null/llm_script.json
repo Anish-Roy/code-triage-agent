@@ -1,0 +1,45 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "path": "app/names.py"
+          },
+          "name": "read_file"
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "real_bug",
+            "confidence": 0.89,
+            "evidence": [
+              {
+                "quote": "TypeError: 'NoneType' object has no attribute 'lower'",
+                "source": "log",
+                "why": "the helper dereferences a missing name"
+              },
+              {
+                "quote": "caller now passes optional names",
+                "source": "diff",
+                "why": "the change introduces a None path"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Return early for `None` or require a name at the caller."
+              },
+              "type": "comment"
+            },
+            "summary": "The slug helper assumes a name is present, but the caller now passes an optional `None`."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

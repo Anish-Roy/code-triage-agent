@@ -1,0 +1,35 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "flaky_test",
+            "confidence": 0.8,
+            "evidence": [
+              {
+                "quote": "PASSED on retry at the same commit",
+                "source": "log",
+                "why": "the same revision passed when rerun"
+              },
+              {
+                "quote": "depends on the machine timezone",
+                "source": "memory",
+                "why": "a known environmental flake"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Pin the timezone in the test environment."
+              },
+              "type": "comment"
+            },
+            "summary": "The failing test passed on retry at the same commit and the diff only adds a return annotation."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

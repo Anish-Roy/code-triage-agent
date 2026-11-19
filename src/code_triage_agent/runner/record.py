@@ -183,6 +183,8 @@ class RunRecorder:
                         skill_id=self._skill_id,
                         skill_version=self._skill_version,
                         config_sha=self._config_sha,
+                        predicted_action=result.decision.recommended_action.type,
+                        decision=result.decision,
                         now=finished_at,
                     )
             except sqlite3.Error as exc:

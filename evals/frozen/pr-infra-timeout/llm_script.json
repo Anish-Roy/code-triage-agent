@@ -1,0 +1,30 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "infra_issue",
+            "confidence": 0.85,
+            "evidence": [
+              {
+                "quote": "TimeoutError: integration suite exceeded 600s",
+                "source": "log",
+                "why": "a suite-level timeout, not an assertion failure"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Rerun once; if the database timeout repeats, escalate to infrastructure."
+              },
+              "type": "comment"
+            },
+            "summary": "The integration suite timed out waiting for the database; no assertion failed."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

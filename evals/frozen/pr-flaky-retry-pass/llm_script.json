@@ -1,0 +1,35 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "flaky_test",
+            "confidence": 0.82,
+            "evidence": [
+              {
+                "quote": "PASSED on retry at commit abc1234",
+                "source": "log",
+                "why": "the same commit passed on retry"
+              },
+              {
+                "quote": "failed intermittently on the shared runner",
+                "source": "memory",
+                "why": "prior runs show the same pattern"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Rerun the failed job once and watch the signature."
+              },
+              "type": "comment"
+            },
+            "summary": "The test passed on retry on the same commit and has a documented flaky history."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "path": "app/service.py"
+          },
+          "name": "read_file"
+        }
+      ]
+    },
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "dependency_or_config",
+            "confidence": 0.85,
+            "evidence": [
+              {
+                "quote": "cannot import name 'new_api' from 'lib'",
+                "source": "log",
+                "why": "the installed library does not export the expected symbol"
+              },
+              {
+                "quote": "from lib import old_api",
+                "source": "diff",
+                "why": "the import changed in this pull request"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Align the import with the installed `lib` version."
+              },
+              "type": "comment"
+            },
+            "summary": "The code imports `old_api`, which is absent from the installed `lib`; use the supported import or pin the compatible version."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

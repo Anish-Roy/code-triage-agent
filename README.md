@@ -87,6 +87,37 @@ run record: routing, decision, evidence, steps, cost, and the rendered comment.
 `--persist` writes the record when the snapshot's event exists in
 `var/triage.db`.
 
-The background agent and live provider client arrive in later phases; see
+### Phase 3 status
+
+The outcome collector and eval harness are implemented. The collector labels
+finished runs from GitHub signals without an LLM; the replay harness scores the
+30-case frozen set and writes JSON + Markdown reports.
+
+```bash
+# Label finished runs (needs GitHub App credentials)
+uv run code-triage-agent outcomes collect --limit 50
+
+# Import a real run into a new case without overwriting anything
+uv run code-triage-agent eval import --run-id r_... --labeler your-name
+
+# Replay the frozen set, or the small deterministic PR subset
+uv run code-triage-agent eval run --set frozen
+uv run code-triage-agent eval run --set frozen --smoke --json
+
+# Inspect a report and re-check hard gates against the baseline
+uv run code-triage-agent eval report --report evals/reports/replay-frozen-*.json
+uv run code-triage-agent eval gates \
+  --report evals/reports/replay-frozen-*.json \
+  --baseline evals/baselines/frozen.json
+```
+
+Frozen cases live under `evals/frozen/` and are never written by the harness.
+Generated reports and the provider cache go to gitignored `evals/reports/` and
+`evals/cache/`; only `evals/baselines/` is committed. See
+[`docs/labeling-guide.md`](./docs/labeling-guide.md) and
+[`docs/phase-3-report.md`](./docs/phase-3-report.md).
+
+The background self-improvement loop (editing skills, triggering and memory, and
+opening config PRs) arrives in later phases; see
 [`IMPLEMENTATION.md`](./IMPLEMENTATION.md) for the ordered build plan and
 [`plan.md`](./plan.md) for the system design.

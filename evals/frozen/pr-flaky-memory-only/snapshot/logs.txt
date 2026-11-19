@@ -1,0 +1,2 @@
+2026-11-05T10:00:02Z FAILED tests/test_queue.py::test_order
+2026-11-05T10:00:02Z E       AssertionError: ordering differed under load

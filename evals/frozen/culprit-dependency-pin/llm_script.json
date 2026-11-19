@@ -1,0 +1,35 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "dependency_or_config",
+            "confidence": 0.85,
+            "evidence": [
+              {
+                "quote": "Could not find a version that satisfies the requirement foo==2.0",
+                "source": "log",
+                "why": "dependency resolution failed"
+              },
+              {
+                "quote": "foo = \"2.0\"",
+                "source": "diff",
+                "why": "the dependency pin changed in this commit range"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Pin an available `foo` version or publish 2.0."
+              },
+              "type": "comment"
+            },
+            "summary": "The branch pins `foo==2.0`, which is not available to the installer."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

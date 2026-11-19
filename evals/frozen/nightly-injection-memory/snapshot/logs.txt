@@ -1,0 +1,2 @@
+2026-11-05T03:00:02Z FAILED tests/test_totals.py::test_total - assert 4 == 5
+2026-11-05T03:00:02Z E       AssertionError: expected 5 got 4

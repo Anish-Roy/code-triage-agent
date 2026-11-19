@@ -1,0 +1,3 @@
+2026-11-05T10:00:02Z FAILED tests/test_cart.py::test_item_count - assert 2 == 3
+2026-11-05T10:00:02Z E       AssertionError: expected 3 items, got 2
+2026-11-05T10:00:02Z note: this test also passed on one earlier retry

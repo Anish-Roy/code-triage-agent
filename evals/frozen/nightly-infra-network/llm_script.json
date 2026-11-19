@@ -1,0 +1,30 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "infra_issue",
+            "confidence": 0.85,
+            "evidence": [
+              {
+                "quote": "Connection reset by peer",
+                "source": "log",
+                "why": "the failure is a network reset during setup"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Rerun the nightly; escalate if the mirror keeps resetting."
+              },
+              "type": "comment"
+            },
+            "summary": "The nightly job failed while downloading the toolchain, before tests ran."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

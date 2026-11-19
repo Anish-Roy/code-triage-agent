@@ -1,0 +1,17 @@
+{
+  "base_sha": "def5678",
+  "collected_at": "2026-11-05T10:00:00Z",
+  "conclusion": "failure",
+  "config_sha": "seed-synthetic",
+  "delivery_id": "delivery-nightly-real-bug-migration",
+  "event_id": 18,
+  "head_sha": "abc1234",
+  "pr_number": 303,
+  "repo": "acme/widgets",
+  "run_attempt": 1,
+  "run_id": "r_nightly_real_bug_migration",
+  "signature": "sig_v1:nightly-real-bug-migration",
+  "source": "schedule",
+  "workflow_name": "CI",
+  "workflow_run_id": 9017
+}

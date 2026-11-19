@@ -1,0 +1,6 @@
+diff --git a/tests/test_queue.py b/tests/test_queue.py
+--- a/tests/test_queue.py
++++ b/tests/test_queue.py
+@@ -1,1 +1,1 @@
+-from collections import deque
++from collections import deque  # noqa: F401

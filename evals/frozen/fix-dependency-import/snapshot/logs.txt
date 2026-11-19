@@ -1,0 +1,2 @@
+2026-11-05T10:00:02Z FAILED tests/test_lib.py::test_import
+2026-11-05T10:00:02Z ImportError: cannot import name 'new_api' from 'lib'

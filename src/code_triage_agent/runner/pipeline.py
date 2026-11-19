@@ -47,6 +47,7 @@ def triage_snapshot(
     github: Any = None,
     persist: bool = True,
     skill_override: str | None = None,
+    temperature: float = 0.2,
     clock: Callable[[], datetime] | None = None,
 ) -> TriageResult:
     loaded = load_snapshot(snapshot_dir)
@@ -104,6 +105,7 @@ def triage_snapshot(
                 ],
                 budget=_clamp_budget(route.budget, settings),
                 timeout_seconds=settings.llm_timeout_seconds,
+                temperature=temperature,
             )
     except Exception as exc:  # keep the audit trail even on unexpected failure
         artifact = recorder.finish_failure(f"{type(exc).__name__}: {exc}")

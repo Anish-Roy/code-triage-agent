@@ -43,6 +43,14 @@ class Settings(BaseSettings):
     snapshot_root: Path = Path("var/snapshots")
     event_root: Path = Path("var/events")
 
+    # Phase 3 eval paths and cost ceiling. Reports and the provider cache are
+    # writable; evals/frozen is read-only to the harness.
+    eval_frozen_dir: Path = Path("evals/frozen")
+    eval_reports_dir: Path = Path("evals/reports")
+    eval_cache_dir: Path = Path("evals/cache")
+    eval_budget_usd: float = Field(default=15.0, gt=0)
+    eval_smoke_cases: int = Field(default=5, ge=1, le=20)
+
     dry_run: bool = True
     replay_mode: bool = False
     auto_merge_memory: bool = False

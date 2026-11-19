@@ -1,0 +1,35 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "flaky_test",
+            "confidence": 0.77,
+            "evidence": [
+              {
+                "quote": "PASSED on retry at the same commit",
+                "source": "log",
+                "why": "the same revision passed when rerun"
+              },
+              {
+                "quote": "assert {'a': 1} == {'a': 1.0}",
+                "source": "log",
+                "why": "the assertion is representation-sensitive"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Compare decoded values instead of raw representations."
+              },
+              "type": "comment"
+            },
+            "summary": "The assertion compares int and float representations and the same commit passed on retry."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

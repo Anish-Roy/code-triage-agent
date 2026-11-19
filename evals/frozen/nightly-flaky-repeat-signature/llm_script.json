@@ -1,0 +1,30 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "flaky_test",
+            "confidence": 0.79,
+            "evidence": [
+              {
+                "quote": "passed on rerun",
+                "source": "memory",
+                "why": "the exact signature has a documented rerun pass"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Make the clock test independent of wall-clock midnight."
+              },
+              "type": "comment"
+            },
+            "summary": "The same midnight assertion has failed repeatedly and always passed on rerun."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

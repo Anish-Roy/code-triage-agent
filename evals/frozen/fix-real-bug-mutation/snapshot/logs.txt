@@ -1,0 +1,1 @@
+2026-11-05T10:00:02Z FAILED tests/test_inventory.py::test_snapshot - assert [2, 1] == [1, 2]

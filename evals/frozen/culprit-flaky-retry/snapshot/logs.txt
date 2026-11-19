@@ -1,0 +1,2 @@
+2026-11-05T10:00:02Z FAILED tests/test_time.py::test_zone - assert 0 == 1
+2026-11-05T10:00:02Z note: PASSED on retry at the same commit

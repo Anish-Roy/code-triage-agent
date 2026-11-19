@@ -1,0 +1,2 @@
+2026-11-05T10:00:02Z FAILED tests/test_orders.py::test_total
+2026-11-05T10:00:02Z KeyError: 'user_id'

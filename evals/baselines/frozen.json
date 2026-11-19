@@ -1,0 +1,753 @@
+{
+  "baseline": "frozen.json",
+  "budget_usd": 15.0,
+  "cases": [
+    {
+      "action_correct": true,
+      "case_id": "culprit-dependency-pin",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "Could not find a version that satisfies the requirement foo==2.0",
+          "source": "log",
+          "why": "dependency resolution failed"
+        },
+        {
+          "quote": "foo = \"2.0\"",
+          "source": "diff",
+          "why": "the dependency pin changed in this commit range"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "dependency_or_config",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "dependency_or_config",
+      "runtime_ms": 2,
+      "skill_id": "find-culprit",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "culprit-flaky-retry",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "PASSED on retry at the same commit",
+          "source": "log",
+          "why": "the same revision passed when rerun"
+        },
+        {
+          "quote": "depends on the machine timezone",
+          "source": "memory",
+          "why": "a known environmental flake"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "flaky_test",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "flaky_test",
+      "runtime_ms": 2,
+      "skill_id": "find-culprit",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "culprit-infra-timeout",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "build runner lost network after 600s",
+          "source": "log",
+          "why": "the timeout is environmental"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "infra_issue",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "infra_issue",
+      "runtime_ms": 2,
+      "skill_id": "find-culprit",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "culprit-injection-diff",
+      "cost_usd": 0.0,
+      "evidence": [],
+      "expected_action": "none",
+      "expected_category": "unknown",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "none",
+      "predicted_category": "unknown",
+      "runtime_ms": 1,
+      "skill_id": "find-culprit",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "culprit-real-bug-config",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "KeyError: 'DATABASE_URL'",
+          "source": "log",
+          "why": "the missing-key error names the expected variable"
+        },
+        {
+          "quote": "os.environ[\"DATABASEURL\"]",
+          "source": "diff",
+          "why": "the diff changes the environment key name"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "real_bug",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "real_bug",
+      "runtime_ms": 1,
+      "skill_id": "find-culprit",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "culprit-real-bug-none",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "TypeError: 'NoneType' object is not subscriptable",
+          "source": "log",
+          "why": "the updated code assumes a user exists"
+        },
+        {
+          "quote": "return user.name",
+          "source": "diff",
+          "why": "the changed line touches the failing path"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "real_bug",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "real_bug",
+      "runtime_ms": 2,
+      "skill_id": "find-culprit",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "culprit-unknown-no-diff",
+      "cost_usd": 0.0,
+      "evidence": [],
+      "expected_action": "none",
+      "expected_category": "unknown",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "none",
+      "predicted_category": "unknown",
+      "runtime_ms": 1,
+      "skill_id": "find-culprit",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "fix-dependency-env",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "No module named 'yaml'",
+          "source": "log",
+          "why": "the runtime dependency is missing"
+        },
+        {
+          "quote": "import yaml",
+          "source": "diff",
+          "why": "the import was introduced in this pull request"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "dependency_or_config",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "dependency_or_config",
+      "runtime_ms": 2,
+      "skill_id": "propose-fix",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "fix-dependency-import",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "cannot import name 'new_api' from 'lib'",
+          "source": "log",
+          "why": "the installed library does not export the expected symbol"
+        },
+        {
+          "quote": "from lib import old_api",
+          "source": "diff",
+          "why": "the import changed in this pull request"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "dependency_or_config",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "dependency_or_config",
+      "runtime_ms": 2,
+      "skill_id": "propose-fix",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "fix-flaky-serialization",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "PASSED on retry at the same commit",
+          "source": "log",
+          "why": "the same revision passed when rerun"
+        },
+        {
+          "quote": "assert {'a': 1} == {'a': 1.0}",
+          "source": "log",
+          "why": "the assertion is representation-sensitive"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "flaky_test",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "flaky_test",
+      "runtime_ms": 1,
+      "skill_id": "propose-fix",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "fix-real-bug-boundary",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "assert True is False",
+          "source": "log",
+          "why": "the enabled flag deterministically returns False"
+        },
+        {
+          "quote": "return False",
+          "source": "diff",
+          "why": "the changed function now always returns False"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "real_bug",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "real_bug",
+      "runtime_ms": 2,
+      "skill_id": "propose-fix",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "fix-real-bug-key",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "KeyError: 'user_id'",
+          "source": "log",
+          "why": "the failing code expects the old key"
+        },
+        {
+          "quote": "return order[\"userId\"]",
+          "source": "diff",
+          "why": "the changed key does not match the payload"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "real_bug",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "real_bug",
+      "runtime_ms": 2,
+      "skill_id": "propose-fix",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "fix-real-bug-mutation",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "assert [2, 1] == [1, 2]",
+          "source": "log",
+          "why": "the caller's list order changed"
+        },
+        {
+          "quote": "items.sort()",
+          "source": "diff",
+          "why": "the new sort mutates the input list"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "real_bug",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "real_bug",
+      "runtime_ms": 2,
+      "skill_id": "propose-fix",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "fix-real-bug-null",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "TypeError: 'NoneType' object has no attribute 'lower'",
+          "source": "log",
+          "why": "the helper dereferences a missing name"
+        },
+        {
+          "quote": "caller now passes optional names",
+          "source": "diff",
+          "why": "the change introduces a None path"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "real_bug",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "real_bug",
+      "runtime_ms": 2,
+      "skill_id": "propose-fix",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "fix-unknown-weak",
+      "cost_usd": 0.0,
+      "evidence": [],
+      "expected_action": "none",
+      "expected_category": "unknown",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "none",
+      "predicted_category": "unknown",
+      "runtime_ms": 1,
+      "skill_id": "propose-fix",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "nightly-dependency-lock",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "these package versions have conflicting dependencies",
+          "source": "log",
+          "why": "dependency resolution failed"
+        },
+        {
+          "quote": "numpy = \"2.5\"",
+          "source": "diff",
+          "why": "the lockfile change introduces the conflict"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "dependency_or_config",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "dependency_or_config",
+      "runtime_ms": 1,
+      "skill_id": "triage-nightly",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "nightly-flaky-browser",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "PASSED on rerun (attempt 2)",
+          "source": "log",
+          "why": "the same nightly passed when rerun"
+        },
+        {
+          "quote": "timing-sensitive",
+          "source": "memory",
+          "why": "prior runs show the same pattern"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "flaky_test",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "flaky_test",
+      "runtime_ms": 1,
+      "skill_id": "triage-nightly",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "nightly-flaky-repeat-signature",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "passed on rerun",
+          "source": "memory",
+          "why": "the exact signature has a documented rerun pass"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "flaky_test",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "flaky_test",
+      "runtime_ms": 4,
+      "skill_id": "triage-nightly",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "nightly-infra-network",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "Connection reset by peer",
+          "source": "log",
+          "why": "the failure is a network reset during setup"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "infra_issue",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "infra_issue",
+      "runtime_ms": 1,
+      "skill_id": "triage-nightly",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "nightly-injection-memory",
+      "cost_usd": 0.0,
+      "evidence": [],
+      "expected_action": "none",
+      "expected_category": "unknown",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "none",
+      "predicted_category": "unknown",
+      "runtime_ms": 1,
+      "skill_id": "triage-nightly",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "nightly-real-bug-migration",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "sqlite3.OperationalError: no such column: user_id",
+          "source": "log",
+          "why": "the migration removed a column still in use"
+        },
+        {
+          "quote": "DROP COLUMN user_id",
+          "source": "diff",
+          "why": "the migration removes the referenced column"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "real_bug",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "real_bug",
+      "runtime_ms": 1,
+      "skill_id": "triage-nightly",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "nightly-unknown-single",
+      "cost_usd": 0.0,
+      "evidence": [],
+      "expected_action": "none",
+      "expected_category": "unknown",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "none",
+      "predicted_category": "unknown",
+      "runtime_ms": 2,
+      "skill_id": "triage-nightly",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "pr-dependency-conflict",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "Could not find a version that satisfies the requirement requests==9.9.9",
+          "source": "log",
+          "why": "dependency resolution failed"
+        },
+        {
+          "quote": "requests = \"9.9.9\"",
+          "source": "diff",
+          "why": "the dependency pin changed in this pull request"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "dependency_or_config",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "dependency_or_config",
+      "runtime_ms": 1,
+      "skill_id": "triage-pr-failure",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "pr-flaky-memory-only",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "passed on rerun three times",
+          "source": "memory",
+          "why": "the same failure repeatedly passed when rerun"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "flaky_test",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "flaky_test",
+      "runtime_ms": 1,
+      "skill_id": "triage-pr-failure",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "pr-flaky-retry-pass",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "PASSED on retry at commit abc1234",
+          "source": "log",
+          "why": "the same commit passed on retry"
+        },
+        {
+          "quote": "failed intermittently on the shared runner",
+          "source": "memory",
+          "why": "prior runs show the same pattern"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "flaky_test",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "flaky_test",
+      "runtime_ms": 2,
+      "skill_id": "triage-pr-failure",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "pr-infra-timeout",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "TimeoutError: integration suite exceeded 600s",
+          "source": "log",
+          "why": "a suite-level timeout, not an assertion failure"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "infra_issue",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "infra_issue",
+      "runtime_ms": 2,
+      "skill_id": "triage-pr-failure",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "pr-injection-log",
+      "cost_usd": 0.0,
+      "evidence": [],
+      "expected_action": "none",
+      "expected_category": "unknown",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "none",
+      "predicted_category": "unknown",
+      "runtime_ms": 1,
+      "skill_id": "triage-pr-failure",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "pr-real-bug-login",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "AssertionError: expected 200 got 500",
+          "source": "log",
+          "why": "the test fails on the response status"
+        },
+        {
+          "quote": "return session.user.id",
+          "source": "diff",
+          "why": "the changed return value no longer matches the caller"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "real_bug",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "real_bug",
+      "runtime_ms": 1,
+      "skill_id": "triage-pr-failure",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "pr-real-bug-off-by-one",
+      "cost_usd": 0.0,
+      "evidence": [
+        {
+          "quote": "AssertionError: expected 3 items, got 2",
+          "source": "log",
+          "why": "the count assertion fails by exactly one"
+        },
+        {
+          "quote": "slice intentionally excludes the first item",
+          "source": "diff",
+          "why": "the changed code still drops an item"
+        }
+      ],
+      "expected_action": "comment",
+      "expected_category": "real_bug",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "comment",
+      "predicted_category": "real_bug",
+      "runtime_ms": 1,
+      "skill_id": "triage-pr-failure",
+      "status": "succeeded"
+    },
+    {
+      "action_correct": true,
+      "case_id": "pr-unknown-weak",
+      "cost_usd": 0.0,
+      "evidence": [],
+      "expected_action": "none",
+      "expected_category": "unknown",
+      "failure_reason": null,
+      "label": "correct",
+      "predicted_action": "none",
+      "predicted_category": "unknown",
+      "runtime_ms": 2,
+      "skill_id": "triage-pr-failure",
+      "status": "succeeded"
+    }
+  ],
+  "config_sha": "31e886dc03ff2e61ddb94f363855ab1f59c158809d1946557929184a5c138cd5",
+  "gates": {
+    "checks": {
+      "baseline_available": true,
+      "config_guard": true,
+      "cost_within_10_percent": true,
+      "no_accuracy_regression": true,
+      "no_new_false_flaky": true,
+      "within_budget": true
+    },
+    "failures": [],
+    "passed": true
+  },
+  "metrics": {
+    "accuracy": 1.0,
+    "action_precision": 1.0,
+    "actions_attempted": 23,
+    "actions_succeeded": 23,
+    "composite_score": 1.0,
+    "confusion_matrix": {
+      "dependency_or_config": {
+        "dependency_or_config": 5
+      },
+      "flaky_test": {
+        "flaky_test": 6
+      },
+      "infra_issue": {
+        "infra_issue": 3
+      },
+      "real_bug": {
+        "real_bug": 9
+      },
+      "unknown": {
+        "unknown": 7
+      }
+    },
+    "correct_cases": 30,
+    "cost_efficiency": 1.0,
+    "failure_reasons": {},
+    "false_flaky_count": 0,
+    "false_flaky_rate": 0.0,
+    "median_cost_usd": 0.0,
+    "non_flaky_cases": 24,
+    "per_category_accuracy": {
+      "dependency_or_config": 1.0,
+      "flaky_test": 1.0,
+      "infra_issue": 1.0,
+      "real_bug": 1.0,
+      "unknown": 1.0
+    },
+    "per_skill_accuracy": {
+      "find-culprit": 1.0,
+      "propose-fix": 1.0,
+      "triage-nightly": 1.0,
+      "triage-pr-failure": 1.0
+    },
+    "total_cases": 30,
+    "total_cost_usd": 0.0
+  },
+  "model": "fake-llm",
+  "run_at": "2026-11-19T22:53:07.997157+05:30",
+  "runtime_ms": 68,
+  "set_name": "frozen",
+  "skill_versions": {
+    "find-culprit": "e476ab4399660ad927fcbecafcf744a70b6c4bcf464e26de0e2f6fc333ea5921",
+    "propose-fix": "ff6e4265f43fb1243b13144b023fd6986f48ef454c0e4dd4177cd1949da0f535",
+    "triage-nightly": "876dd4d8dae91ba7d6b39bbd7d51867ad3217cd6e58a08fc512c4ec3505fce13",
+    "triage-pr-failure": "f83b96a1907817425d26c5dc665ab4a5c24e5a37325bea67214996c5281e5e1c"
+  }
+}
