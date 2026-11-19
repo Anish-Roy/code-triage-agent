@@ -1,0 +1,35 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "dependency_or_config",
+            "confidence": 0.85,
+            "evidence": [
+              {
+                "quote": "these package versions have conflicting dependencies",
+                "source": "log",
+                "why": "dependency resolution failed"
+              },
+              {
+                "quote": "numpy = \"2.5\"",
+                "source": "diff",
+                "why": "the lockfile change introduces the conflict"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Pin a compatible numpy version or upgrade the job's Python."
+              },
+              "type": "comment"
+            },
+            "summary": "The nightly lock moved to `numpy 2.5`, which conflicts with the job's Python version."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

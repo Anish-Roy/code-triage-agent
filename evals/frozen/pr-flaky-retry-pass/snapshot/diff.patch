@@ -1,0 +1,6 @@
+diff --git a/tests/test_cache.py b/tests/test_cache.py
+--- a/tests/test_cache.py
++++ b/tests/test_cache.py
+@@ -1,2 +1,2 @@
+-def test_expiry():
++def test_expiry() -> None:

@@ -1,0 +1,35 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "dependency_or_config",
+            "confidence": 0.85,
+            "evidence": [
+              {
+                "quote": "Could not find a version that satisfies the requirement requests==9.9.9",
+                "source": "log",
+                "why": "dependency resolution failed"
+              },
+              {
+                "quote": "requests = \"9.9.9\"",
+                "source": "diff",
+                "why": "the dependency pin changed in this pull request"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Pin an available `requests` version."
+              },
+              "type": "comment"
+            },
+            "summary": "The branch pins an unavailable `requests` version, so installation fails before tests run."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

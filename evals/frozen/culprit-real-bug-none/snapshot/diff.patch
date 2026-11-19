@@ -1,0 +1,6 @@
+diff --git a/app/profile.py b/app/profile.py
+--- a/app/profile.py
++++ b/app/profile.py
+@@ -20,2 +20,2 @@
+-    return user["name"]
++    return user.name

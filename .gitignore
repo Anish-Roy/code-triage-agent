@@ -13,6 +13,10 @@ wheels/
 var/
 .env
 
+# Generated eval output; commit only the deliberate baseline
+evals/reports/
+evals/cache/
+
 # Tool caches
 .mypy_cache/
 .pytest_cache/

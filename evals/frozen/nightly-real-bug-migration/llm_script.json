@@ -1,0 +1,35 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "real_bug",
+            "confidence": 0.93,
+            "evidence": [
+              {
+                "quote": "sqlite3.OperationalError: no such column: user_id",
+                "source": "log",
+                "why": "the migration removed a column still in use"
+              },
+              {
+                "quote": "DROP COLUMN user_id",
+                "source": "diff",
+                "why": "the migration removes the referenced column"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Keep the column or update the export query in the same change."
+              },
+              "type": "comment"
+            },
+            "summary": "The migration drops `user_id` while the export query still selects it."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

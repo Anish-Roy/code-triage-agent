@@ -1,0 +1,13 @@
+{
+  "case_id": "fix-real-bug-null",
+  "expected_action": "comment",
+  "expected_category": "real_bug",
+  "expected_skill": "propose-fix",
+  "hard_boundary": true,
+  "labeler": "seed-synthetic",
+  "notes": "Synthetic seed case generated from the Phase 2 replay fixtures; pending human confirmation.",
+  "snapshot_path": "snapshot",
+  "tags": [
+    "real_bug"
+  ]
+}

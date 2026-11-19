@@ -1,0 +1,6 @@
+diff --git a/app/totals.py b/app/totals.py
+--- a/app/totals.py
++++ b/app/totals.py
+@@ -8,1 +8,1 @@
+-    return total
++    return total - 1

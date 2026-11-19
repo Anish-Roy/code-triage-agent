@@ -1,0 +1,7 @@
+diff --git a/app/inventory.py b/app/inventory.py
+--- a/app/inventory.py
++++ b/app/inventory.py
+@@ -3,2 +3,2 @@
+-    return list(items)
++    items.sort()
++    return items

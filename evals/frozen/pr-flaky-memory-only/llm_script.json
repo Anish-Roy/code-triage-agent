@@ -1,0 +1,30 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "flaky_test",
+            "confidence": 0.78,
+            "evidence": [
+              {
+                "quote": "passed on rerun three times",
+                "source": "memory",
+                "why": "the same failure repeatedly passed when rerun"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Quarantine the ordering test or make it deterministic under load."
+              },
+              "type": "comment"
+            },
+            "summary": "The diff only touches an import comment and the same ordering failure has a documented rerun-pass history."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

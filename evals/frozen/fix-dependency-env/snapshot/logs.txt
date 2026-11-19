@@ -1,0 +1,2 @@
+2026-11-05T10:00:02Z FAILED tests/test_config.py::test_load
+2026-11-05T10:00:02Z ModuleNotFoundError: No module named 'yaml'

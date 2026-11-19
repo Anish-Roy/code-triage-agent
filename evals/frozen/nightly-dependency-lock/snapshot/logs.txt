@@ -1,0 +1,2 @@
+2026-11-05T03:00:02Z ERROR: Cannot install -r requirements.txt because these package versions have conflicting dependencies
+2026-11-05T03:00:02Z The conflict is caused by: numpy 2.5 requires Python >=3.12

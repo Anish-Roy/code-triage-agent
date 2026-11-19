@@ -1,0 +1,13 @@
+{
+  "case_id": "nightly-flaky-repeat-signature",
+  "expected_action": "comment",
+  "expected_category": "flaky_test",
+  "expected_skill": "triage-nightly",
+  "hard_boundary": true,
+  "labeler": "seed-synthetic",
+  "notes": "Synthetic seed case generated from the Phase 2 replay fixtures; pending human confirmation.",
+  "snapshot_path": "snapshot",
+  "tags": [
+    "flaky_test"
+  ]
+}

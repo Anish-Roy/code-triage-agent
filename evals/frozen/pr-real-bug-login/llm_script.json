@@ -1,0 +1,35 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "real_bug",
+            "confidence": 0.85,
+            "evidence": [
+              {
+                "quote": "AssertionError: expected 200 got 500",
+                "source": "log",
+                "why": "the test fails on the response status"
+              },
+              {
+                "quote": "return session.user.id",
+                "source": "diff",
+                "why": "the changed return value no longer matches the caller"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Restore the user object or update the caller to use the id."
+              },
+              "type": "comment"
+            },
+            "summary": "`app/auth.py` now returns the user id instead of the user object, so login raises and returns 500."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

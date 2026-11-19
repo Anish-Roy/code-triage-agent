@@ -1,0 +1,35 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "real_bug",
+            "confidence": 0.92,
+            "evidence": [
+              {
+                "quote": "KeyError: 'DATABASE_URL'",
+                "source": "log",
+                "why": "the missing-key error names the expected variable"
+              },
+              {
+                "quote": "os.environ[\"DATABASEURL\"]",
+                "source": "diff",
+                "why": "the diff changes the environment key name"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Restore the `DATABASE_URL` key name."
+              },
+              "type": "comment"
+            },
+            "summary": "The changed settings lookup reads `DATABASEURL`, a key that does not exist in the environment."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

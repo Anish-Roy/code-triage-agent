@@ -1,0 +1,15 @@
+{
+  "case_id": "culprit-infra-timeout",
+  "expected_action": "comment",
+  "expected_category": "infra_issue",
+  "expected_skill": "find-culprit",
+  "hard_boundary": false,
+  "labeler": "seed-synthetic",
+  "notes": "Synthetic seed case generated from the Phase 2 replay fixtures; pending human confirmation.",
+  "reviewed_at": "2026-11-18T12:00:00Z",
+  "reviewer": "reviewer-b",
+  "snapshot_path": "snapshot",
+  "tags": [
+    "infra_issue"
+  ]
+}

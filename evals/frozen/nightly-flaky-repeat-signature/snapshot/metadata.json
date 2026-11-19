@@ -1,0 +1,17 @@
+{
+  "base_sha": "def5678",
+  "collected_at": "2026-11-05T10:00:00Z",
+  "conclusion": "failure",
+  "config_sha": "seed-synthetic",
+  "delivery_id": "delivery-nightly-flaky-repeat-signature",
+  "event_id": 21,
+  "head_sha": "abc1234",
+  "pr_number": 306,
+  "repo": "acme/widgets",
+  "run_attempt": 1,
+  "run_id": "r_nightly_flaky_repeat_signature",
+  "signature": "sig_v1:clock-midnight",
+  "source": "schedule",
+  "workflow_name": "CI",
+  "workflow_run_id": 9020
+}

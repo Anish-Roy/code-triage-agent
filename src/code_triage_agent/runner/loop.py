@@ -66,6 +66,7 @@ def run_loop(
     messages: Sequence[LLMMessage],
     budget: BudgetConfig,
     timeout_seconds: float = 60.0,
+    temperature: float = _BASE_TEMPERATURE,
     clock: Callable[[], float] | None = None,
 ) -> LoopResult:
     now = clock or time.monotonic
@@ -77,7 +78,7 @@ def run_loop(
     usage = TokenUsage()
     seq = 1
     invalid_attempts = 0
-    temperature = _BASE_TEMPERATURE
+    current_temperature = temperature
     failure_reason: str | None = None
     status: RunnerStatus = "failed"
 
@@ -104,7 +105,7 @@ def run_loop(
                 llm,
                 conversation,
                 tools,
-                temperature=temperature,
+                temperature=current_temperature,
                 timeout_seconds=timeout_seconds,
             )
         except LLMError as exc:
@@ -113,7 +114,7 @@ def run_loop(
                     seq=next_seq(),
                     kind="llm",
                     tool="llm",
-                    args={"temperature": temperature},
+                    args={"temperature": current_temperature},
                     result=None,
                     is_error=True,
                     latency_ms=_elapsed_ms(call_started, now()),
@@ -134,7 +135,7 @@ def run_loop(
                 seq=next_seq(),
                 kind="llm",
                 tool=f"llm:{response.model or llm.model}",
-                args={"temperature": temperature, "messages": len(conversation)},
+                args={"temperature": current_temperature, "messages": len(conversation)},
                 result={
                     "content": response.content,
                     "tool_calls": [call.name for call in response.tool_calls],
@@ -212,7 +213,7 @@ def run_loop(
                         status = "failed"
                     else:
                         invalid_attempts += 1
-                        temperature = _RETRY_TEMPERATURE
+                        current_temperature = _RETRY_TEMPERATURE
                     for skipped in calls[index + 1 :]:
                         conversation.append(
                             LLMMessage(

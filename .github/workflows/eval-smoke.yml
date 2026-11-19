@@ -1,0 +1,39 @@
+name: Eval smoke
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  replay-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.12.1"
+          enable-cache: true
+
+      - name: Install
+        run: uv sync --frozen
+
+      - name: Replay smoke subset against the frozen baseline
+        run: >
+          uv run code-triage-agent eval run
+          --set frozen
+          --smoke
+          --baseline evals/baselines/frozen.json
+          --report-dir evals/reports
+          --json
+
+      - name: Upload replay report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-smoke-report
+          path: evals/reports/
+          if-no-files-found: warn

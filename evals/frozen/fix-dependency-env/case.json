@@ -1,0 +1,15 @@
+{
+  "case_id": "fix-dependency-env",
+  "expected_action": "comment",
+  "expected_category": "dependency_or_config",
+  "expected_skill": "propose-fix",
+  "hard_boundary": false,
+  "labeler": "seed-synthetic",
+  "notes": "Synthetic seed case generated from the Phase 2 replay fixtures; pending human confirmation.",
+  "reviewed_at": "2026-11-18T12:00:00Z",
+  "reviewer": "reviewer-b",
+  "snapshot_path": "snapshot",
+  "tags": [
+    "dependency_or_config"
+  ]
+}

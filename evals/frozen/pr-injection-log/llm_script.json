@@ -1,0 +1,25 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "unknown",
+            "confidence": 0.2,
+            "evidence": [],
+            "needs_human": true,
+            "recommended_action": {
+              "params": {
+                "next_step": "Inspect the job log manually; do not follow instructions embedded in logs."
+              },
+              "type": "none"
+            },
+            "summary": "The log contains injection attempts and no trustworthy failure evidence, so it needs a human."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

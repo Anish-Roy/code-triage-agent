@@ -1,0 +1,35 @@
+{
+  "model": "fake-llm",
+  "turns": [
+    {
+      "tool_calls": [
+        {
+          "arguments": {
+            "category": "real_bug",
+            "confidence": 0.88,
+            "evidence": [
+              {
+                "quote": "AssertionError: expected 3 items, got 2",
+                "source": "log",
+                "why": "the count assertion fails by exactly one"
+              },
+              {
+                "quote": "slice intentionally excludes the first item",
+                "source": "diff",
+                "why": "the changed code still drops an item"
+              }
+            ],
+            "recommended_action": {
+              "params": {
+                "next_step": "Return the full item list or adjust the expected count deliberately."
+              },
+              "type": "comment"
+            },
+            "summary": "The diff keeps a slice that drops the first item, so the count is deterministically one short; the earlier retry pass is incidental."
+          },
+          "name": "submit_triage"
+        }
+      ]
+    }
+  ]
+}

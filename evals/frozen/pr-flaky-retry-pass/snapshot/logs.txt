@@ -1,0 +1,2 @@
+2026-11-05T10:00:02Z FAILED tests/test_cache.py::test_expiry - assert 0 > 5
+2026-11-05T10:00:02Z note: PASSED on retry at commit abc1234 after a clock skew warning

@@ -1,0 +1,3 @@
+2026-11-05T03:00:02Z Starting nightly build
+2026-11-05T03:00:02Z Connection reset by peer while downloading the toolchain
+2026-11-05T03:00:02Z ##[error]Process completed with exit code 1.

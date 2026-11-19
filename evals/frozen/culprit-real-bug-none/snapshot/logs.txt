@@ -1,0 +1,2 @@
+2026-11-05T10:00:02Z FAILED tests/test_profile.py::test_profile - TypeError
+2026-11-05T10:00:02Z TypeError: 'NoneType' object is not subscriptable

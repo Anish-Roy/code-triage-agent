@@ -1,0 +1,13 @@
+[
+  {
+    "confidence": "medium",
+    "created_at": "2026-10-15T00:00:00Z",
+    "evidence_runs": [
+      "r_old_6"
+    ],
+    "note": "test_zone depends on the machine timezone and has passed on rerun before.",
+    "repo": "acme/widgets",
+    "signature": "sig_v1:time-zone",
+    "source": "human"
+  }
+]

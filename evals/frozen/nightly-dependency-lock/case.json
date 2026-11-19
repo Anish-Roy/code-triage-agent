@@ -1,0 +1,13 @@
+{
+  "case_id": "nightly-dependency-lock",
+  "expected_action": "comment",
+  "expected_category": "dependency_or_config",
+  "expected_skill": "triage-nightly",
+  "hard_boundary": false,
+  "labeler": "seed-synthetic",
+  "notes": "Synthetic seed case generated from the Phase 2 replay fixtures; pending human confirmation.",
+  "snapshot_path": "snapshot",
+  "tags": [
+    "dependency_or_config"
+  ]
+}

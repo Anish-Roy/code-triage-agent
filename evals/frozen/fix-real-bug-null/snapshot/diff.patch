@@ -1,0 +1,7 @@
+diff --git a/app/names.py b/app/names.py
+--- a/app/names.py
++++ b/app/names.py
+@@ -5,2 +5,2 @@
+-    return name.lower()
++    return name.lower()
++# caller now passes optional names

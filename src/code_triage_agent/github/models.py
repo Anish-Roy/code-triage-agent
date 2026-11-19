@@ -66,6 +66,11 @@ class GitHubPullRequest(BaseModel):
     state: str
     merged: bool = False
     merge_commit_sha: str | None = None
+    title: str | None = None
+    body: str | None = None
+    # The REST API does not expose a revert flag. Recorded fixtures may set it
+    # so the outcome collector can exercise the revert branch.
+    reverted: bool = False
     head: GitHubBranchRef
     base: GitHubBranchRef
 
